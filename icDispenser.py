@@ -37,7 +37,7 @@ class App:
     
     monoFont = ("Monospace", 9)
 
-    inventoryFilePath = "/home/andrew/icDispenserGui/inventory.csv"
+    inventoryFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
     itemListFormat = "{:<12} #InTube {:<6} i{:<}"
     inventory = []
     formattedInventory = []
