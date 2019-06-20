@@ -6,30 +6,6 @@ import threading
 import queue
 #import tkSimpleDialog
 
-#IC Dispenser Python Tkinter GUI Program
-#Written by Andrew Hollabaugh, started 1/27/19
-#
-#Graphical interface for Integrated Circuit (IC) Dispenser project. Uses Tkinter (Tk) user interface library
-#for python.
-#
-#Communicates with an ATMEGA328 microcontroller over serial, which runs the dispenser at a lower level.
-#
-#Reads/writes inventory.csv, which keeps track of what part numbers are stored in what tube inecies, and other info.
-#Each row corresponds to a tube, and the line number in the file its index
-#Row Format:
-#PART_NUMBER,NUMBER_OF_ITEMS_LEFT,IC_LENGTH,TUBE_LENGTH
-#
-#Basic functionality:
-# - Shows a list of IC part numbers, sorted by name or physical index
-# - Ability to select which ICs to dispense and dispense them
-# - Message log of things that happened
-# - Disable button - press if something bad happens
-#
-#Advanced functionality:
-# - Enable and disabled individual motors
-# - Testing features such as move to next tube and dispense a number of millimeters
-#
-
 global hasExited
 global serialQueue 
 
