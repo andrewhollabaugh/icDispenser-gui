@@ -49,17 +49,17 @@ class App:
     baud = 9600
     ser = None
 
-    moveToPosCommand = "M"
-    homeCommand = "H"
-    enableSMCommand = "E"
-    enableDMCommand = "N"
-    disableSMCommand = "D"
-    disableDMCommand = "S"
-    numberItemsCommand = "T"
-    moveOneCommand = "O"
+    moveSelCommand = "M"
+    homeSelCommand = "H"
+    enableSelCommand = "E"
+    enableDisCommand = "N"
+    disableSelCommand = "D"
+    disableDisCommand = "S"
+    totalTubesCommand = "T"
+    moveSelNextCommand = "O"
     dispenseCommand = "I"
-    homeDispenserCommand = "R"
-    testDispenseCommand = "Q"
+    homeDisCommand = "R"
+    dispenseNoHomeCommand = "Q"
 
     state = "none" #Possible states: none, moveToPos, dispense, homing
     hasHomed = False
@@ -278,43 +278,43 @@ class App:
 
     #Enable selector motor
     def enableSM(s):
-        s.sendSerial(s.enableSMCommand)
+        s.sendSerial(s.enableSelCommand)
         s.messageInsert("enabling selector motor")
 
     #Enable dispenser motor
     def enableDM(s):
-        s.sendSerial(s.enableDMCommand)
+        s.sendSerial(s.enableDisCommand)
         s.messageInsert("enabling dispenser motor")
 
     #Disable selector motor
     def disableSM(s):
-        s.sendSerial(s.disableSMCommand)
+        s.sendSerial(s.disableSelCommand)
         s.messageInsert("disabling selector motor")
 
     #Disable dispenser motor
     def disableDM(s):
-        s.sendSerial(s.disableDMCommand)
+        s.sendSerial(s.disableDisCommand)
         s.messageInsert("disabling dispenser motor")
 
     #Disable both motors
     def disableAll(s):
-        s.sendSerial(s.disableSMCommand)
-        s.sendSerial(s.disableDMCommand)
+        s.sendSerial(s.disableSelCommand)
+        s.sendSerial(s.disableDisCommand)
         s.messageInsert("disabling all")
 
     #Home selector motor
     def homeSM(s):
-        s.sendSerial(s.homeCommand)
+        s.sendSerial(s.homeSelCommand)
         s.messageInsert("homing selector")
 
     #Move selector to next tube (for testing)
     def moveOne(s):
-        s.sendSerial(s.moveOneCommand)
+        s.sendSerial(s.moveSelNextCommand)
         s.messageInsert("moving to next item")
 
     #Home dispenser motor
     def homeDM(s):
-        s.sendSerial(s.homeDispenserCommand)
+        s.sendSerial(s.homeDisCommand)
         s.messageInsert("homing dispenser")
 
     #Update inventory list from inventory.csv file
@@ -404,7 +404,7 @@ class App:
         #if s.hasHomed:
         name = s.itemListBox.get(ACTIVE)
         index = s.formattedInventory.index(name) #get the listbox index of the item
-        s.sendCommandWithArgument(s.moveToPosCommand, index)
+        s.sendCommandWithArgument(s.moveSelCommand, index)
         s.messageInsert("Moving to tube " + name)
         #else:
         #    s.initHome()
@@ -417,7 +417,7 @@ class App:
 
     def testDispenseByMM(s):
         mm = s.dispenseMMEntry.get()
-        s.sendCommandWithArgument(s.testDispenseCommand, mm)
+        s.sendCommandWithArgument(s.dispenseNoHomeCommand, mm)
         s.messageInsert("Testing Dispense " + mm + " mm")
 
     #Send serial command that has a three-digit argument
@@ -513,7 +513,7 @@ class App:
     #Sends a moveToPos command during the dispense routine based on the first index in the dispense list
     def disRMoveToPos(s):
         index = s.dispense[0][0]
-        s.sendCommandWithArgument(s.moveToPosCommand, index)
+        s.sendCommandWithArgument(s.moveSelCommand, index)
         s.state = "moveToPos"
         s.messageInsert("Dispense: Moving to index " + index)
 
