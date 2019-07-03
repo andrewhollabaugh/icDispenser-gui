@@ -10,7 +10,7 @@ Communicates with an ATMEGA328 microcontroller over serial, which runs the dispe
 Reads/writes inventory.csv, which keeps track of what part numbers are stored in what tube indexes, and other info.
 Each row corresponds to a tube, and the line number in the file its index
 Row Format:
-PART_NUMBER,NUMBER_OF_ITEMS_LEFT,IC_LENGTH,TUBE_LENGTH
+PART_NUMBER,NUMBER_OF_ITEMS_LEFT
 
 ### Basic functionality
 - Shows a list of IC part numbers, sorted by name or index

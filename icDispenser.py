@@ -37,7 +37,7 @@ class App:
     homeDisCommand = "R"
     dispenseNoHomeCommand = "Q"
 
-    state = "none" #Possible states: none, moveToPos, dispense, homing
+    state = "none" #Possible states: none, moveToIndex, dispense, homing
     hasHomed = False
     global hasExited
     hasExited = False
@@ -315,7 +315,7 @@ class App:
 
     #Functionality for overwriting a single value to the inventory.csv file.
     #indexStr - string containing index of item to modify
-    #valueType - string specifying the parameter to modify. Options are  "name", "qtyInTube", "icLength", or "tubeLength" 
+    #valueType - string specifying the parameter to modify. Options are  "name", "qtyInTube" 
     #value - new value to write
     def writeInventoryFile(s, indexStr, valueType, value):
         itemData = []
@@ -326,7 +326,7 @@ class App:
             for item in itemFile:
                 itemData.append(item)
 
-        print("itemData when writing1: " + str(itemData))
+        print("itemData when writing: " + str(itemData))
 
         index = int(indexStr)
 
@@ -334,13 +334,9 @@ class App:
         itemRow = itemData[index]
 
         if valueType == "name":
-            itemData[index] = [value, itemRow[1], itemRow[2], itemRow[3]]
+            itemData[index] = [value, itemRow[1]]
         elif valueType == "qtyInTube":
-            itemData[index] = [itemRow[0], value, itemRow[2], itemRow[3]]
-        elif valueType == "icLength":
-            itemData[index] = [itemRow[0], itemRow[1], value, itemRow[3]]
-        elif valueType == "tubeLength":
-            itemData[index] = [itemRow[0], itemRow[1], itemRow[2], value]
+            itemData[index] = [itemRow[0], value]
 
         print("itemData when writing2: " + str(itemData))
 
@@ -444,9 +440,9 @@ class App:
     #row in the dispense list is created (if that item's index not already in the dispense list) or add 1 to
     #the dispense amount in an existing row (if the item's index is already in the dispense list).
     #
-    #disMoveToPos() is called, then waits for a serial signal from the microcontroller to say it is done moving
+    #disMoveToIndex() is called, then waits for a serial signal from the microcontroller to say it is done moving
     #to position. disDispense() is called, and it waits for another signal to say it is done dispensing.
-    #disNext() is called, which updates stuff and either ends the dispense routine, or calls disMoveToPos() again
+    #disNext() is called, which updates stuff and either ends the dispense routine, or calls disMoveToIndex() again
     #if there is another item to dispense
     def initDispenseRoutine(s):
         #if there are any items selected to dispense
@@ -481,34 +477,28 @@ class App:
                             item[1] = str(int(item[1]) + 1)
             print(s.dispense)
             
-            s.disRMoveToPos()
+            s.disRMoveToIndex()
 
         else:
             s.messageInsert("error: no items to dispense")
 
-    #Sends a moveToPos command during the dispense routine based on the first index in the dispense list
-    def disRMoveToPos(s):
+    #Sends a moveToIndex command during the dispense routine based on the first index in the dispense list
+    def disRMoveToIndex(s):
         index = s.dispense[0][0]
         s.sendCommandWithArgument(s.moveSelCommand, index)
-        s.state = "moveToPos"
+        s.state = "moveToIndex"
         s.messageInsert("Dispense: Moving to index " + index)
 
     #Sends a dispense command during the dispense routine based on the dispense and inventory lists.
     #Calculates number of millimeters to dispense
     def disRDispense(s):
-        index = int(s.dispense[0][0])
         qtyToDispense = int(s.dispense[0][1])
-        qtyInTube = int(s.inventory[index][1])
-        icLength = float(s.inventory[index][2])
-        tubeLength = float(s.inventory[index][3])
-        mm = float((tubeLength - (qtyInTube * icLength)) + (qtyToDispense * icLength))
-        mmR = int(round(mm))
-        s.sendCommandWithArgument(s.dispenseCommand, mmR)
+        s.sendCommandWithArgument(s.dispenseCommand, qtyToDispense)
         s.state = "dispense"
-        s.messageInsert("Dispense: Dispensing " + str(qtyToDispense) + " items; moving " + str(mmR) + " mm")
+        s.messageInsert("Dispense: Dispensing " + str(qtyToDispense) + " items")
 
     #Updates inventory.csv file, dispense list, inventory list after a dispense action. Repeats the dispense
-    #cycle by running disMoveToPos if there are more items to dispense
+    #cycle by running disMoveToIndex if there are more items to dispense
     def disRNext(s):
         index = int(s.dispense[0][0])
         qtyDispensed = int(s.dispense[0][1])
@@ -518,6 +508,7 @@ class App:
         s.writeInventoryFile(s.dispense[0][0], "qtyInTube", str(qtyInTube - qtyDispensed))
 
         del s.dispense[0]
+        print("testtest")
 
         print("dispenseList: " + str(s.dispense))
 
@@ -526,7 +517,7 @@ class App:
             s.state = "none"
             s.messageInsert("Dispense: Done")
         else:
-            s.disRMoveToPos()
+            s.disRMoveToIndex()
 
     #Runs when window is closed. Used to update hasExited so SerialThread knows when to stop
     def onClosing(s):
@@ -542,17 +533,19 @@ class App:
             serialLine = serialQueue.get() #also removes item from queue
             print("serialR: " + serialLine)
              
-            if serialLine == "done moving to pos" and s.state == "moveToPos":
-                    s.disRDispense()
+            if serialLine == "done moving to index" and s.state == "moveToIndex":
+                s.disRDispense()
             elif serialLine == "done homing dispenser":
                 if s.state == "dispense":
                     s.disRNext()
                 elif s.state == "homing":
                     s.homeSM()
-            elif serialLine == "homing...":
+            elif serialLine == "start sel home":
                 s.messageInsert("Homing selector")
             elif serialLine == "done homing selector" and s.state == "homing":
                 s.state = "none"
+            elif serialLine == "dispenser already homed":
+                s.messageInsert("dispenser already homed")
 
         root.after(100, s.processSerialRead)
 
