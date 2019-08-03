@@ -184,7 +184,7 @@ class App:
         s.serialFrame.grid(row=3, column=1, rowspan=3)
         #end advancedFrame stuff
 
-        s.disableButton = Button(s.controlFrame, text="Disable", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
+        s.disableButton = Button(s.controlFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
 
         
         s.changeItemsButton = Button(s.controlFrame, text="Change Item Locations", font=s.monoFont)
