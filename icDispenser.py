@@ -274,6 +274,7 @@ class App:
     def disableAll(s):
         s.sendSerial(s.disableSelCommand)
         s.sendSerial(s.disableDisCommand)
+        s.resetDisR()
         s.messageInsert("disabling all")
 
     #Home selector motor
@@ -519,6 +520,12 @@ class App:
             s.messageInsert("Dispense: Done")
         else:
             s.disRMoveToIndex()
+
+    def resetDisR(s):
+        s.dispense = []
+
+    def undoDispense(s):
+        pass
 
     #Runs when window is closed. Used to update hasExited so SerialThread knows when to stop
     def onClosing(s):
