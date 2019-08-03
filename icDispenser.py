@@ -21,10 +21,6 @@ class App:
     formattedSelectedItems = []
     dispense = []
 
-    port = "/dev/ttyUSB0"
-    baud = 9600
-    ser = None
-
     moveSelCommand = "M"
     homeSelCommand = "H"
     enableSelCommand = "E"
@@ -36,6 +32,8 @@ class App:
     dispenseCommand = "I"
     homeDisCommand = "R"
     dispenseNoHomeCommand = "Q"
+
+    ser = None
 
     state = "none" #Possible states: none, moveToIndex, dispense, homing
     hasHomed = False
@@ -351,8 +349,11 @@ class App:
 
     #Open serial communications with microcontroller
     def openSerial(s):
+        port = "/dev/ttyUSB0"
+        baud = 9600
+
         try:
-            s.ser = serial.Serial(s.port, s.baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
+            s.ser = serial.Serial(port, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
             print("serial connected")
         except:
             print("error: failed to open serial")
