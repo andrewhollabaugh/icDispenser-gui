@@ -59,11 +59,10 @@ class App:
         #   -addArrowButton
         #   -removeArrowButton
         #   -dispenseButton
+        #   -undoButton
         #controlFrame
         #   -advancedFrame
         #       -debug/test buttons
-        #       -serialFrame
-        #           -portEntry/connectButton
         #   -disableButton
         #   -changeItemsButton
         #messageFrame
@@ -128,6 +127,8 @@ class App:
 
         s.dispenseButton = Button(s.commonFrame, text="Dispense", font=s.monoFont, bg="lime", command=s.initDispenseRoutine)
 
+        s.undoButton = Button(s.commonFrame, text="Undo", font=s.monoFont, bg="orange", command=s.undoDispense)
+
         #commonframe grid
         s.selectLabel.grid(row=0, column=0)
         s.itemSelectFrame.grid(row=1, column=0, rowspan=2)
@@ -135,8 +136,9 @@ class App:
         s.addArrowButton.grid(row=1, column=1)
         s.deleteArrowButton.grid(row=2, column=1)
         s.selectLabel2.grid(row=0, column=2)
-        s.itemSelectFrame2.grid(row=1, column=2, rowspan=2)
+        s.itemSelectFrame2.grid(row=1, column=2, rowspan=2, columnspan=2)
         s.dispenseButton.grid(row=3, column=2, sticky=W)
+        s.undoButton.grid(row=3, column=3, sticky=E)
 
         #CONTROLFRAME STUFF
         s.advancedFrame = LabelFrame(s.controlFrame, text="Advanced", font=s.monoFont, relief=RIDGE, borderwidth=5)
@@ -158,18 +160,6 @@ class App:
 
         s.testDispenseMMButton = Button(s.advancedFrame, text="Test Dispense by mm", font=s.monoFont, command=s.testDispenseByMM)
 
-        s.serialFrame = LabelFrame(s.advancedFrame, text="Serial", font=s.monoFont, relief=RIDGE, borderwidth=5)
-
-        #serialFrame stuff
-        s.portLabel = Label(s.serialFrame, text="Port", font=s.monoFont)
-        s.portEntry = Entry(s.serialFrame, width=8)
-        s.connectButton = Button(s.serialFrame, text="Connect", font=s.monoFont)
-
-        s.portLabel.grid(row=0, column=0, sticky=E)
-        s.portEntry.grid(row=0, column=1)
-        s.connectButton.grid(row=1, column=0, columnspan=2)
-        #end serialFrame stuff
-
         s.enableSMButton.grid(row=0, column=0, sticky=W)
         s.enableDMButton.grid(row=2, column=0, sticky=W)
         s.disableSMButton.grid(row=1, column=0, sticky=W)
@@ -181,7 +171,6 @@ class App:
         s.dispenseMMButton.grid(row=0, column=1)
         s.testDispenseMMButton.grid(row=1, column=1)
         s.dispenseMMEntry.grid(row=2, column=1)
-        s.serialFrame.grid(row=3, column=1, rowspan=3)
         #end advancedFrame stuff
 
         s.disableButton = Button(s.controlFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
@@ -350,7 +339,7 @@ class App:
 
     #Open serial communications with microcontroller
     def openSerial(s):
-        port = "/dev/ttyUSB0"
+        port = "/dev/USB-SERIAL-CABLE"
         baud = 9600
 
         try:
