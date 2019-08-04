@@ -153,13 +153,6 @@ class App:
         s.moveOneButton = Button(s.advancedFrame, text="Move to next tube", font=s.monoFont, command=s.moveOne)
         s.moveToSelectedItemButton = Button(s.advancedFrame, text="Move to selected item", font=s.monoFont, command=s.moveToSelectedItem)
 
-        s.dispenseMMEntry = Entry(s.advancedFrame, width=5)
-        s.dispenseMMEntry.insert(0, "0")
-
-        s.dispenseMMButton = Button(s.advancedFrame, text="Dispense by mm", font=s.monoFont, command=s.dispenseByMM)
-
-        s.testDispenseMMButton = Button(s.advancedFrame, text="Test Dispense by mm", font=s.monoFont, command=s.testDispenseByMM)
-
         s.enableSMButton.grid(row=0, column=0, sticky=W)
         s.enableDMButton.grid(row=2, column=0, sticky=W)
         s.disableSMButton.grid(row=1, column=0, sticky=W)
@@ -168,9 +161,6 @@ class App:
         s.homeDispenserButton.grid(row=5, column=0, sticky=W)
         s.moveOneButton.grid(row=6, column=0, sticky=W)
         s.moveToSelectedItemButton.grid(row=7, column=0, sticky=W)
-        s.dispenseMMButton.grid(row=0, column=1)
-        s.testDispenseMMButton.grid(row=1, column=1)
-        s.dispenseMMEntry.grid(row=2, column=1)
         #end advancedFrame stuff
 
         s.disableButton = Button(s.controlFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
@@ -372,17 +362,6 @@ class App:
         #else:
         #    s.initHome()
 
-    #Dispense a number of millimeters based on an Entry widget, mainly for debug
-    def dispenseByMM(s):
-        mm = s.dispenseMMEntry.get()
-        s.sendCommandWithArgument(s.dispenseCommand, mm)
-        s.messageInsert("Dispenseing " + mm + " mm")
-
-    def testDispenseByMM(s):
-        mm = s.dispenseMMEntry.get()
-        s.sendCommandWithArgument(s.dispenseNoHomeCommand, mm)
-        s.messageInsert("Testing Dispense " + mm + " mm")
-
     #Send serial command that has a three-digit argument
     def sendCommandWithArgument(s, command, arg):
         argStr = ""
@@ -499,7 +478,6 @@ class App:
         s.writeInventoryFile(s.dispense[0][0], "qtyInTube", str(qtyInTube - qtyDispensed))
 
         del s.dispense[0]
-        print("testtest")
 
         print("dispenseList: " + str(s.dispense))
 
