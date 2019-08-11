@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 import serial
 import numpy
 import csv
@@ -12,6 +13,7 @@ global serialQueue
 class App:
     
     monoFont = ("Monospace", 9)
+    monoFontBold = ("Monospace", 9, "bold")
 
     inventoryFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
     itemListFormat = "{:<12} #InTube {:<6} i{:<}"
@@ -83,17 +85,28 @@ class App:
 
         #COMMONFRAME STUFF
 
-        #itemSelectFrame stuff
-        s.itemSelectFrame = Frame(s.commonFrame)
-        s.itemListBoxScroll = Scrollbar(s.itemSelectFrame, orient=VERTICAL)
-        s.itemListBox = Listbox(s.itemSelectFrame, width=30, height = 25, font=s.monoFont, yscrollcommand=s.itemListBoxScroll.set)
-        s.itemListBoxScroll.config(command=s.itemListBox.yview)
-        s.updateItemListBox("index")
-        s.itemListBox.pack(side=LEFT)
-        s.itemListBoxScroll.pack(side=RIGHT, fill=Y)
-        #end itemSelectFrame stuff
+        #invFrame stuff
+        s.invFrame = Frame(s.commonFrame)
 
-        s.selectLabel = Label(s.commonFrame, text="Select Items to Dispense", font=s.monoFont)
+        columns = ("Part", "Index", "Qty", "Tube")
+        s.invTree = ttk.Treeview(s.invFrame, columns=columns, show="headings", selectmode="extended", height=20)
+        s.invTree.column("Part", width=100, anchor='w')
+        s.invTree.column("Index", width=50, anchor='w')
+        s.invTree.column("Qty", width=50, anchor='w')
+        s.invTree.column("Tube", width=70, anchor='w')
+
+        for col in columns:
+           s.invTree.heading(col, text=col, command=lambda _col=col: s.treeviewSortColumn(s.invTree, _col, False)) 
+
+        s.invTreeScroll = Scrollbar(s.invFrame, orient=VERTICAL)
+        s.invTreeScroll.config(command=s.invTree.yview)
+        s.invTree.configure(yscrollcommand=s.invTreeScroll.set)
+
+        s.invTree.pack(side=LEFT)
+        s.invTreeScroll.pack(side=RIGHT, fill=Y)
+        #end invFrame stuff
+
+        s.selectLabel = Label(s.commonFrame, text="Select Items to Dispense", font=s.monoFontBold)
 
         #itemSelectFrame2 stuff
         s.itemSelectFrame2 = Frame(s.commonFrame)
@@ -106,21 +119,6 @@ class App:
 
         s.selectLabel2 = Label(s.commonFrame, text="Items To Dispense", font=s.monoFont)
 
-        s.sortFrame = Frame(s.commonFrame)
-
-        #sortFrame stuff
-        s.sortOptionMenuList = ["Index", "Name"]
-        s.sortOptionMenuVar = StringVar(root)
-        s.sortOptionMenuVar.trace("w", s.sortOptionMenuChange)
-        s.sortOptionMenuVar.set(s.sortOptionMenuList[0])
-        s.sortOptionMenu = OptionMenu(s.sortFrame, s.sortOptionMenuVar, *s.sortOptionMenuList)
-
-        s.sortLabel = Label(s.sortFrame, text="Sort By:", font=s.monoFont)
-
-        s.sortLabel.pack(side=LEFT)
-        s.sortOptionMenu.pack(side=RIGHT)
-        #end sortFrame stuff
-
         s.addArrowButton = Button(s.commonFrame, text="---->", font=s.monoFont, command=s.addItemToSelected)
 
         s.deleteArrowButton = Button(s.commonFrame, text="<----", font=s.monoFont, command=s.removeItemFromSelected)
@@ -131,7 +129,7 @@ class App:
 
         #commonframe grid
         s.selectLabel.grid(row=0, column=0)
-        s.itemSelectFrame.grid(row=1, column=0, rowspan=2)
+        s.invFrame.grid(row=1, column=0, rowspan=2)
         s.sortFrame.grid(row=3, column=0)
         s.addArrowButton.grid(row=1, column=1)
         s.deleteArrowButton.grid(row=2, column=1)
@@ -192,10 +190,10 @@ class App:
 
 
         #OTHER INIT STUFF
-        s.updateInventoryFromFile()
-        s.updateItemListBox("index")
-        s.openSerial()
+        s.updateInventory()
+        s.updateInvTree(s.invTree, s.inventory)
         s.messageInsert("IC Dispenser Started")
+        s.openSerial()
 
         global serialQueue
         serialQueue = queue.Queue()
@@ -211,23 +209,25 @@ class App:
     def clearMessageListBox(s):
         s.messageListBox.delete(0, END)
 
-    #Reads inventory list and updates item list box to display the list contents sorted by index or name
-    #sortType - string containing either "index" or "name" for sorting type
-    def updateItemListBox(s, sortType):
-        s.itemListBox.delete(0, END)
-        if sortType == "index":
-            for item in s.formattedInventory:
-                s.itemListBox.insert(END, item)
-        elif sortType == "name":
-            for item in numpy.sort(s.formattedInventory): #sorts inventory by name
-                s.itemListBox.insert(END, item)
+    def treeviewSortColumn(s, treeview, col, reverse):
+        l = [(treeview.set(k, col), k) for k in treeview.get_children('')]
+        l.sort(reverse=reverse)
 
-    #Run whenever sortOptionMenu changes. Runs updateItemListBox to redisplay list contents after sorting type changes
-    def sortOptionMenuChange(s, *args):
-        if s.sortOptionMenuVar.get() == "Index":
-            s.updateItemListBox("index")
-        elif s.sortOptionMenuVar.get() == "Name":
-            s.updateItemListBox("name")
+        #rearrange the items in sorted positions
+        for i, (val, k) in enumerate(l):
+            treeview.move(k, '', i)
+
+        #reverse sorting
+        treeview.heading(col, command=lambda _col=col: s.treeviewSortColumn(treeview, _col, not reverse))
+
+    def updateInvTree(s, treeview, inventory):
+        treeview.delete(*treeview.get_children())
+        for item in inventory:
+            index = inventory.index(item)
+            name = item[0]
+            qty = item[1]
+            tubeType = item[2]
+            treeview.insert("", "end", text=index, values=(name, index, qty, tubeType))
 
     #Enable selector motor
     def enableSM(s):
@@ -274,7 +274,7 @@ class App:
     #Update inventory list from inventory.csv file
     #First reads the file and puts contents in inventory list (sorted by index)
     #Creates a formattedInventory array, formatted for use in the itemListBox, using contents from inventory list
-    def updateInventoryFromFile(s):
+    def updateInventory(s):
         s.inventory = []
         with open(s.inventoryFilePath, 'r') as inventoryFile:
             itemData = csv.reader(inventoryFile, delimiter=',')
@@ -283,19 +283,11 @@ class App:
 
         print("inventory after reading: " + str(s.inventory))
 
-        s.formattedInventory = []
-        for item in s.inventory:
-            index = s.inventory.index(item)
-            name = item[0];
-            amount = item[1];
-            itemInfoList = [name, amount, index]
-            s.formattedInventory.append(s.itemListFormat.format(name, amount, index))
-
     #Functionality for overwriting a single value to the inventory.csv file.
     #indexStr - string containing index of item to modify
     #valueType - string specifying the parameter to modify. Options are  "name", "qtyInTube" 
     #value - new value to write
-    def writeInventoryFile(s, indexStr, valueType, value):
+    def writeInventory(s, indexStr, valueType, value):
         itemData = []
         
         #Read the inventory.csv file first and put into list
@@ -324,8 +316,8 @@ class App:
             for item in itemData:
                 writer.writerow(item)
 
-        s.updateInventoryFromFile()
-        s.sortOptionMenuChange()
+        s.updateInventory()
+        #s.sortOptionMenuChange()
 
     #Open serial communications with microcontroller
     def openSerial(s):
@@ -477,7 +469,7 @@ class App:
         qtyInTube = int(s.inventory[index][1])
 
         #update inventory.csv file 
-        s.writeInventoryFile(s.dispense[0][0], "qtyInTube", str(qtyInTube - qtyDispensed))
+        s.writeInventory(s.dispense[0][0], "qtyInTube", str(qtyInTube - qtyDispensed))
 
         del s.dispense[0]
 
