@@ -536,7 +536,7 @@ class SerialThread(threading.Thread):
     def run(s):
         global hasExited
         global serialQueue
-        while not hasExited:
+        while not hasExited and s.ser is not None:
             serBuffer = ""
             while True:
                 c = s.ser.read().decode('ascii')
