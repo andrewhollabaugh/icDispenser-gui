@@ -231,45 +231,45 @@ class App:
 
     #Enable selector motor
     def enableSM(s):
-        s.sendSerial(s.enableSelCommand)
-        s.messageInsert("enabling selector motor")
+        success = s.sendSerial(s.enableSelCommand)
+        if success: s.messageInsert("enabling selector motor")
 
     #Enable dispenser motor
     def enableDM(s):
-        s.sendSerial(s.enableDisCommand)
-        s.messageInsert("enabling dispenser motor")
+        success = s.sendSerial(s.enableDisCommand)
+        if success: s.messageInsert("enabling dispenser motor")
 
     #Disable selector motor
     def disableSM(s):
-        s.sendSerial(s.disableSelCommand)
-        s.messageInsert("disabling selector motor")
+        success = s.sendSerial(s.disableSelCommand)
+        if success: s.messageInsert("disabling selector motor")
 
     #Disable dispenser motor
     def disableDM(s):
-        s.sendSerial(s.disableDisCommand)
-        s.messageInsert("disabling dispenser motor")
+        success: s.sendSerial(s.disableDisCommand)
+        if success: s.messageInsert("disabling dispenser motor")
 
     #Disable both motors
     def disableAll(s):
-        s.sendSerial(s.disableSelCommand)
-        s.sendSerial(s.disableDisCommand)
+        success1 = s.sendSerial(s.disableSelCommand)
+        success2 = s.sendSerial(s.disableDisCommand)
+        if success1 and success2: s.messageInsert("disabling all")
         s.resetDisR()
-        s.messageInsert("disabling all")
 
     #Home selector motor
     def homeSM(s):
-        s.sendSerial(s.homeSelCommand)
-        s.messageInsert("homing selector")
+        success = s.sendSerial(s.homeSelCommand)
+        if success: s.messageInsert("homing selector")
 
     #Move selector to next tube (for testing)
     def moveOne(s):
-        s.sendSerial(s.moveSelNextCommand)
-        s.messageInsert("moving to next item")
+        success = s.sendSerial(s.moveSelNextCommand)
+        if success: s.messageInsert("moving to next item")
 
     #Home dispenser motor
     def homeDM(s):
-        s.sendSerial(s.homeDisCommand)
-        s.messageInsert("homing dispenser")
+        success = s.sendSerial(s.homeDisCommand)
+        if success: s.messageInsert("homing dispenser")
 
     #Update inventory list from inventory.csv file
     #First reads the file and puts contents in inventory list (sorted by index)
@@ -334,9 +334,9 @@ class App:
 
         try:
             s.ser = serial.Serial(port, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
-            print("serial connected")
+            s.messageInsert("serial connected")
         except:
-            print("error: failed to open serial")
+            s.messageInsert("error: failed to open serial")
 
     #Send data over serial with added carriage return
     def sendSerial(s, data):
@@ -344,8 +344,10 @@ class App:
         data = data + "\n"
         try:
             s.ser.write(data.encode('utf-8'))
+            return True
         except:
-            print("error: serial is disconnected")
+            s.messageInsert("error: serial port closed")
+            return False
 
     def initHome(s):
         s.state = "homing"
