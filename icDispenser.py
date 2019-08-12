@@ -240,7 +240,8 @@ class App:
             name = item[0]
             qty = item[1]
             tubeType = item[2]
-            treeview.insert("", "end", text=index, values=(name, index, qty, tubeType))
+            treeview.insert("", "end", iid=index, values=(name, index, qty, tubeType))
+        treeview.selection_set(0)
 
     #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
     #If no item is selected, it adds the first item (index 0)
