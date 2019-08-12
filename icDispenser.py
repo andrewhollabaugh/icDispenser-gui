@@ -106,13 +106,13 @@ class App:
         s.invTreeScroll.pack(side=RIGHT, fill=Y)
         #end invFrame stuff
 
-        s.invLabel = Label(s.commonFrame, text="Select Items to Dispense", font=s.monoFontBold)
+        s.invLabel = Label(s.commonFrame, text="Select ICs to Dispense", font=s.monoFontBold)
 
         #disFrame stuff
         s.disFrame = Frame(s.commonFrame)
 
         disTreeColumns = ("Part", "Index", "Qty", "Tube")
-        s.disTree = ttk.Treeview(s.disFrame, column=disTreeColumns, show="headings", selectmode="extended", height=10)
+        s.disTree = ttk.Treeview(s.disFrame, column=disTreeColumns, show="headings", selectmode="extended", height=14)
         s.disTree.column("Part", width=100, anchor='w')
         s.disTree.column("Index", width=50, anchor='w')
         s.disTree.column("Qty", width=50, anchor='w')
@@ -130,25 +130,24 @@ class App:
         #end disFrame stuff
 
 
-        s.disLabel = Label(s.commonFrame, text="Items To Dispense", font=s.monoFontBold)
+        s.disLabel = Label(s.commonFrame, text="ICs To Dispense", font=s.monoFontBold)
 
-        s.addArrowButton = Button(s.commonFrame, text="---->", font=s.monoFont, command=s.addItemToSelected)
+        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=s.addItemToSelected)
 
-        s.deleteArrowButton = Button(s.commonFrame, text="<----", font=s.monoFont, command=s.removeItemFromSelected)
+        s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=s.removeItemFromSelected)
 
-        s.dispenseButton = Button(s.commonFrame, text="Dispense", font=s.monoFont, bg="lime", command=s.initDispenseRoutine)
-
-        s.undoButton = Button(s.commonFrame, text="Undo", font=s.monoFont, bg="orange", command=s.undoDispense)
+        s.dispenseFrame = Frame(s.commonFrame, relief=RIDGE, borderwidth=5)
+        s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", command=s.initDispenseRoutine)
+        s.dispenseButton.grid(row=0, column=0)
 
         #commonframe grid
         s.invLabel.grid(row=0, column=0)
         s.invFrame.grid(row=1, column=0, rowspan=2)
-        s.addArrowButton.grid(row=1, column=1)
-        s.deleteArrowButton.grid(row=2, column=1)
-        s.disLabel.grid(row=0, column=2)
-        s.disFrame.grid(row=1, column=2, rowspan=2, columnspan=2, sticky=N)
-        s.dispenseButton.grid(row=3, column=2, sticky=W)
-        s.undoButton.grid(row=3, column=3, sticky=E)
+        s.addButton.grid(row=3, column=0, sticky=EW)
+        s.disLabel.grid(row=0, column=1)
+        s.disFrame.grid(row=1, column=1, sticky=N)
+        s.deleteButton.grid(row=2, column=1, sticky=EW)
+        s.dispenseFrame.grid(row=3, column=1, sticky=E)
 
         #CONTROLFRAME STUFF
         s.advancedFrame = LabelFrame(s.controlFrame, text="Advanced", font=s.monoFont, relief=RIDGE, borderwidth=5)
@@ -175,6 +174,7 @@ class App:
 
         s.disableButton = Button(s.controlFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
 
+        s.undoButton = Button(s.controlFrame, text="Undo", font=s.monoFont, bg="orange", command=s.undoDispense)
         
         s.changeItemsButton = Button(s.controlFrame, text="Change Item Locations", font=s.monoFont)
 
@@ -182,6 +182,7 @@ class App:
         s.advancedFrame.grid(row=0, column=0, rowspan=3)
         s.changeItemsButton.grid(row=1, column=1)
         s.disableButton.grid(row=2, column=1)
+        s.undoButton.grid(row=3, column=1)
 
         #MESSAGEFRAME STUFF
         s.messageListBoxFrame = Frame(s.messageFrame)
