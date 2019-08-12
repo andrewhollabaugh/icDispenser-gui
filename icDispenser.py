@@ -88,14 +88,14 @@ class App:
         #invFrame stuff
         s.invFrame = Frame(s.commonFrame)
 
-        columns = ("Part", "Index", "Qty", "Tube")
-        s.invTree = ttk.Treeview(s.invFrame, columns=columns, show="headings", selectmode="extended", height=20)
+        invTreeColumns = ("Part", "Index", "Qty", "Tube")
+        s.invTree = ttk.Treeview(s.invFrame, columns=invTreeColumns, show="headings", selectmode="extended", height=20)
         s.invTree.column("Part", width=100, anchor='w')
         s.invTree.column("Index", width=50, anchor='w')
         s.invTree.column("Qty", width=50, anchor='w')
         s.invTree.column("Tube", width=70, anchor='w')
 
-        for col in columns:
+        for col in invTreeColumns:
            s.invTree.heading(col, text=col, command=lambda _col=col: s.treeviewSortColumn(s.invTree, _col, False)) 
 
         s.invTreeScroll = Scrollbar(s.invFrame, orient=VERTICAL)
@@ -106,18 +106,31 @@ class App:
         s.invTreeScroll.pack(side=RIGHT, fill=Y)
         #end invFrame stuff
 
-        s.selectLabel = Label(s.commonFrame, text="Select Items to Dispense", font=s.monoFontBold)
+        s.invLabel = Label(s.commonFrame, text="Select Items to Dispense", font=s.monoFontBold)
 
-        #itemSelectFrame2 stuff
-        s.itemSelectFrame2 = Frame(s.commonFrame)
-        s.itemListBox2Scroll = Scrollbar(s.itemSelectFrame2, orient=VERTICAL)
-        s.itemListBox2 = Listbox(s.itemSelectFrame2, width=30, height = 25, font=s.monoFont, yscrollcommand=s.itemListBox2Scroll.set)
-        s.itemListBox2Scroll.config(command=s.itemListBox2.yview)
-        s.itemListBox2.pack(side=LEFT)
-        s.itemListBox2Scroll.pack(side=RIGHT, fill=Y)
-        #end itemSelectFrame2 stuff)
+        #disFrame stuff
+        s.disFrame = Frame(s.commonFrame)
 
-        s.selectLabel2 = Label(s.commonFrame, text="Items To Dispense", font=s.monoFont)
+        disTreeColumns = ("Part", "Index", "Qty", "Tube")
+        s.disTree = ttk.Treeview(s.disFrame, column=disTreeColumns, show="headings", selectmode="extended", height=10)
+        s.disTree.column("Part", width=100, anchor='w')
+        s.disTree.column("Index", width=50, anchor='w')
+        s.disTree.column("Qty", width=50, anchor='w')
+        s.disTree.column("Tube", width=70, anchor='w')
+
+        for col in disTreeColumns:
+           s.disTree.heading(col, text=col, command=lambda _col=col: s.treeviewSortColumn(s.disTree, _col, False)) 
+
+        s.disTreeScroll = Scrollbar(s.disFrame, orient=VERTICAL)
+        s.disTreeScroll.config(command=s.disTree.yview)
+        s.disTree.configure(yscrollcommand=s.disTreeScroll.set)
+
+        s.disTree.pack(side=LEFT)
+        s.disTreeScroll.pack(side=RIGHT, fill=Y)
+        #end disFrame stuff
+
+
+        s.disLabel = Label(s.commonFrame, text="Items To Dispense", font=s.monoFontBold)
 
         s.addArrowButton = Button(s.commonFrame, text="---->", font=s.monoFont, command=s.addItemToSelected)
 
@@ -128,12 +141,12 @@ class App:
         s.undoButton = Button(s.commonFrame, text="Undo", font=s.monoFont, bg="orange", command=s.undoDispense)
 
         #commonframe grid
-        s.selectLabel.grid(row=0, column=0)
+        s.invLabel.grid(row=0, column=0)
         s.invFrame.grid(row=1, column=0, rowspan=2)
         s.addArrowButton.grid(row=1, column=1)
         s.deleteArrowButton.grid(row=2, column=1)
-        s.selectLabel2.grid(row=0, column=2)
-        s.itemSelectFrame2.grid(row=1, column=2, rowspan=2, columnspan=2)
+        s.disLabel.grid(row=0, column=2)
+        s.disFrame.grid(row=1, column=2, rowspan=2, columnspan=2, sticky=N)
         s.dispenseButton.grid(row=3, column=2, sticky=W)
         s.undoButton.grid(row=3, column=3, sticky=E)
 
