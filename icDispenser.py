@@ -134,7 +134,7 @@ class App:
 
         s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItemToSelected(s.invTree, s.disTree, s.inventory))
 
-        s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=s.removeItemFromSelected)
+        s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=lambda: s.removeItemFromSelected(s.disTree))
 
         s.dispenseFrame = Frame(s.commonFrame, relief=RIDGE, borderwidth=5)
         s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", command=s.initDispenseRoutine)
@@ -268,15 +268,21 @@ class App:
             s.messageInsert("error: no ICs left in tube")
 
     #Remove item from list of selected items (itemListBox2), occurs when left arrow button is pressed
-    def removeItemFromSelected(s):
+    def removeItemFromSelected(s, treeview):
+        selectedItems = treeview.selection()
+        if len(selectedItems) > 0:
+            index = selectedItems[0]
+            name = treeview.set(index)['Part']
+            treeview.delete(index)
+            s.messageInsert("Removed IC: " + name + " at index " + index)
+
         #if there is at least one item selected
-        if len(s.itemListBox2.curselection()) > 0:
-            itemToRemoveIndex = s.itemListBox2.curselection()[0]
-        else:
-            itemToRemoveIndex = 0
-        itemToRemoveName = s.itemListBox2.get(itemToRemoveIndex)
-        s.itemListBox2.delete(itemToRemoveIndex)
-        s.messageInsert("Removed item: " + itemToRemoveName)
+        #if len(s.itemListBox2.curselection()) > 0:
+        #    itemToRemoveIndex = s.itemListBox2.curselection()[0]
+        #else:
+        #    itemToRemoveIndex = 0
+        #itemToRemoveName = s.itemListBox2.get(itemToRemoveIndex)
+        #s.itemListBox2.delete(itemToRemoveIndex)
 
     #Update inventory list from inventory.csv file
     #First reads the file and puts contents in inventory list (sorted by index)
