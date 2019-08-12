@@ -281,14 +281,6 @@ class App:
             treeview.delete(index)
             s.messageInsert("Removed IC: " + name + " at index " + index)
 
-        #if there is at least one item selected
-        #if len(s.itemListBox2.curselection()) > 0:
-        #    itemToRemoveIndex = s.itemListBox2.curselection()[0]
-        #else:
-        #    itemToRemoveIndex = 0
-        #itemToRemoveName = s.itemListBox2.get(itemToRemoveIndex)
-        #s.itemListBox2.delete(itemToRemoveIndex)
-
     #Update inventory list from inventory.csv file
     #First reads the file and puts contents in inventory list (sorted by index)
     #Creates a formattedInventory array, formatted for use in the itemListBox, using contents from inventory list
