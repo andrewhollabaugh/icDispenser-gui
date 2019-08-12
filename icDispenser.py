@@ -132,9 +132,9 @@ class App:
 
         s.disLabel = Label(s.commonFrame, text="ICs To Dispense", font=s.monoFontBold)
 
-        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItemToSelected(s.invTree, s.disTree))
+        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItem(s.invTree, s.disTree))
 
-        s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=lambda: s.removeItemFromSelected(s.disTree))
+        s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=lambda: s.removeItem(s.disTree))
 
         s.dispenseFrame = Frame(s.commonFrame, relief=RIDGE, borderwidth=5)
         s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", command=s.initDispenseRoutine)
@@ -245,7 +245,7 @@ class App:
 
     #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
     #If no item is selected, it adds the first item (index 0)
-    def addItemToSelected(s, treeviewFrom, treeviewTo):
+    def addItem(s, treeviewFrom, treeviewTo):
         index = treeviewFrom.selection()[0]
         indexInt = int(index)
 
@@ -274,7 +274,7 @@ class App:
             s.messageInsert("error: no ICs left in tube")
 
     #Remove item from list of selected items (itemListBox2), occurs when left arrow button is pressed
-    def removeItemFromSelected(s, treeview):
+    def removeItem(s, treeview):
         selectedItems = treeview.selection()
         if len(selectedItems) > 0:
             index = selectedItems[0]
