@@ -132,7 +132,7 @@ class App:
 
         s.disLabel = Label(s.commonFrame, text="ICs To Dispense", font=s.monoFontBold)
 
-        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=s.addItemToSelected)
+        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItemToSelected(s.invTree, s.disTree, s.inventory))
 
         s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=s.removeItemFromSelected)
 
@@ -245,18 +245,25 @@ class App:
 
     #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
     #If no item is selected, it adds the first item (index 0)
-    def addItemToSelected(s):
-        #if there is at least one item selected
-        if len(s.itemListBox.curselection()) > 0:
-            itemToAddIndex = s.itemListBox.curselection()[0]
-        else:
-            itemToAddIndex = 0
+    def addItemToSelected(s, treeviewFrom, treeviewTo, inventory):
+        index = treeviewFrom.selection()[0]
+        indexInt = int(index)
 
-        #check if the number of ICs in tube > 0
-        if int(s.inventory[itemToAddIndex][1]) > 0:
-            itemToAddName = s.itemListBox.get(itemToAddIndex)
-            s.itemListBox2.insert(END, itemToAddName)
-            s.messageInsert("Added item: " + itemToAddName)
+        name = inventory[indexInt][0]
+        qtyLeft = inventory[indexInt][1]
+        tubeType = inventory[indexInt][2]
+        qty = 1
+
+        if int(qtyLeft) > 0:
+            indexesAlreadyIn = []
+            for item in treeviewTo.get_children(""):
+                indexesAlreadyIn.append(item)
+            if index in indexesAlreadyIn:
+                qtyAlreadyIn = treeviewTo.set(index)['Qty']
+                treeviewTo.set(index, column="Qty", value=int(qtyAlreadyIn) + int(qty))
+            else:
+                treeviewTo.insert("", "end", iid=index, values=(name, index, qty, tubeType))
+            s.messageInsert("Added IC: " + name + " at index " + index)
         else:
             s.messageInsert("error: no ICs left in tube")
 
