@@ -228,48 +228,6 @@ class App:
             tubeType = item[2]
             treeview.insert("", "end", text=index, values=(name, index, qty, tubeType))
 
-    #Enable selector motor
-    def enableSM(s):
-        success = s.sendSerial(s.enableSelCommand)
-        if success: s.messageInsert("enabling selector motor")
-
-    #Enable dispenser motor
-    def enableDM(s):
-        success = s.sendSerial(s.enableDisCommand)
-        if success: s.messageInsert("enabling dispenser motor")
-
-    #Disable selector motor
-    def disableSM(s):
-        success = s.sendSerial(s.disableSelCommand)
-        if success: s.messageInsert("disabling selector motor")
-
-    #Disable dispenser motor
-    def disableDM(s):
-        success: s.sendSerial(s.disableDisCommand)
-        if success: s.messageInsert("disabling dispenser motor")
-
-    #Disable both motors
-    def disableAll(s):
-        success1 = s.sendSerial(s.disableSelCommand)
-        success2 = s.sendSerial(s.disableDisCommand)
-        if success1 and success2: s.messageInsert("disabling all")
-        s.resetDisR()
-
-    #Home selector motor
-    def homeSM(s):
-        success = s.sendSerial(s.homeSelCommand)
-        if success: s.messageInsert("homing selector")
-
-    #Move selector to next tube (for testing)
-    def moveOne(s):
-        success = s.sendSerial(s.moveSelNextCommand)
-        if success: s.messageInsert("moving to next item")
-
-    #Home dispenser motor
-    def homeDM(s):
-        success = s.sendSerial(s.homeDisCommand)
-        if success: s.messageInsert("homing dispenser")
-
     #Update inventory list from inventory.csv file
     #First reads the file and puts contents in inventory list (sorted by index)
     #Creates a formattedInventory array, formatted for use in the itemListBox, using contents from inventory list
@@ -339,6 +297,48 @@ class App:
         except:
             s.messageInsert("error: serial port closed")
             return False
+
+    #Enable selector motor
+    def enableSM(s):
+        success = s.sendSerial(s.enableSelCommand)
+        if success: s.messageInsert("enabling selector motor")
+
+    #Enable dispenser motor
+    def enableDM(s):
+        success = s.sendSerial(s.enableDisCommand)
+        if success: s.messageInsert("enabling dispenser motor")
+
+    #Disable selector motor
+    def disableSM(s):
+        success = s.sendSerial(s.disableSelCommand)
+        if success: s.messageInsert("disabling selector motor")
+
+    #Disable dispenser motor
+    def disableDM(s):
+        success: s.sendSerial(s.disableDisCommand)
+        if success: s.messageInsert("disabling dispenser motor")
+
+    #Disable both motors
+    def disableAll(s):
+        success1 = s.sendSerial(s.disableSelCommand)
+        success2 = s.sendSerial(s.disableDisCommand)
+        if success1 and success2: s.messageInsert("disabling all")
+        s.resetDisR()
+
+    #Home selector motor
+    def homeSM(s):
+        success = s.sendSerial(s.homeSelCommand)
+        if success: s.messageInsert("homing selector")
+
+    #Move selector to next tube (for testing)
+    def moveOne(s):
+        success = s.sendSerial(s.moveSelNextCommand)
+        if success: s.messageInsert("moving to next item")
+
+    #Home dispenser motor
+    def homeDM(s):
+        success = s.sendSerial(s.homeDisCommand)
+        if success: s.messageInsert("homing dispenser")
 
     def initHome(s):
         s.state = "homing"
