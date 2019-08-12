@@ -130,7 +130,6 @@ class App:
         #commonframe grid
         s.selectLabel.grid(row=0, column=0)
         s.invFrame.grid(row=1, column=0, rowspan=2)
-        s.sortFrame.grid(row=3, column=0)
         s.addArrowButton.grid(row=1, column=1)
         s.deleteArrowButton.grid(row=2, column=1)
         s.selectLabel2.grid(row=0, column=2)
