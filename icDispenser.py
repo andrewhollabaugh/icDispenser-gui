@@ -242,6 +242,34 @@ class App:
             tubeType = item[2]
             treeview.insert("", "end", text=index, values=(name, index, qty, tubeType))
 
+    #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
+    #If no item is selected, it adds the first item (index 0)
+    def addItemToSelected(s):
+        #if there is at least one item selected
+        if len(s.itemListBox.curselection()) > 0:
+            itemToAddIndex = s.itemListBox.curselection()[0]
+        else:
+            itemToAddIndex = 0
+
+        #check if the number of ICs in tube > 0
+        if int(s.inventory[itemToAddIndex][1]) > 0:
+            itemToAddName = s.itemListBox.get(itemToAddIndex)
+            s.itemListBox2.insert(END, itemToAddName)
+            s.messageInsert("Added item: " + itemToAddName)
+        else:
+            s.messageInsert("error: no ICs left in tube")
+
+    #Remove item from list of selected items (itemListBox2), occurs when left arrow button is pressed
+    def removeItemFromSelected(s):
+        #if there is at least one item selected
+        if len(s.itemListBox2.curselection()) > 0:
+            itemToRemoveIndex = s.itemListBox2.curselection()[0]
+        else:
+            itemToRemoveIndex = 0
+        itemToRemoveName = s.itemListBox2.get(itemToRemoveIndex)
+        s.itemListBox2.delete(itemToRemoveIndex)
+        s.messageInsert("Removed item: " + itemToRemoveName)
+
     #Update inventory list from inventory.csv file
     #First reads the file and puts contents in inventory list (sorted by index)
     #Creates a formattedInventory array, formatted for use in the itemListBox, using contents from inventory list
@@ -381,34 +409,6 @@ class App:
         else:
             argStr = str(arg)
         s.sendSerial(command + argStr)
-
-    #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
-    #If no item is selected, it adds the first item (index 0)
-    def addItemToSelected(s):
-        #if there is at least one item selected
-        if len(s.itemListBox.curselection()) > 0:
-            itemToAddIndex = s.itemListBox.curselection()[0]
-        else:
-            itemToAddIndex = 0
-
-        #check if the number of ICs in tube > 0
-        if int(s.inventory[itemToAddIndex][1]) > 0:
-            itemToAddName = s.itemListBox.get(itemToAddIndex)
-            s.itemListBox2.insert(END, itemToAddName)
-            s.messageInsert("Added item: " + itemToAddName)
-        else:
-            s.messageInsert("error: no ICs left in tube")
-
-    #Remove item from list of selected items (itemListBox2), occurs when left arrow button is pressed
-    def removeItemFromSelected(s):
-        #if there is at least one item selected
-        if len(s.itemListBox2.curselection()) > 0:
-            itemToRemoveIndex = s.itemListBox2.curselection()[0]
-        else:
-            itemToRemoveIndex = 0
-        itemToRemoveName = s.itemListBox2.get(itemToRemoveIndex)
-        s.itemListBox2.delete(itemToRemoveIndex)
-        s.messageInsert("Removed item: " + itemToRemoveName)
 
     #Initiialze the dispense routine. How the dispense routine works:
     #This method is run whenever the dispense button is pressed. It adds the items in the selected items list
