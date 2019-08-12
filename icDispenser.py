@@ -132,7 +132,7 @@ class App:
 
         s.disLabel = Label(s.commonFrame, text="ICs To Dispense", font=s.monoFontBold)
 
-        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItemToSelected(s.invTree, s.disTree, s.inventory))
+        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItemToSelected(s.invTree, s.disTree))
 
         s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=lambda: s.removeItemFromSelected(s.disTree))
 
@@ -245,13 +245,14 @@ class App:
 
     #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
     #If no item is selected, it adds the first item (index 0)
-    def addItemToSelected(s, treeviewFrom, treeviewTo, inventory):
+    def addItemToSelected(s, treeviewFrom, treeviewTo):
         index = treeviewFrom.selection()[0]
         indexInt = int(index)
 
-        name = inventory[indexInt][0]
-        qtyLeft = inventory[indexInt][1]
-        tubeType = inventory[indexInt][2]
+        values = treeviewFrom.set(index)
+        name = values['Part']
+        qtyLeft = values['Qty']
+        tubeType = values['Tube']
         qty = 1
 
         if int(qtyLeft) > 0:
