@@ -260,10 +260,15 @@ class App:
                 indexesAlreadyIn.append(item)
             if index in indexesAlreadyIn:
                 qtyAlreadyIn = treeviewTo.set(index)['Qty']
-                treeviewTo.set(index, column="Qty", value=int(qtyAlreadyIn) + int(qty))
+                qtyNew = int(qtyAlreadyIn) + int(qty)
+                if qtyNew <= int(qtyLeft):
+                    treeviewTo.set(index, column="Qty", value=qtyNew)
+                    s.messageInsert("Added IC: " + name + " at index " + index)
+                else:
+                    s.messageInsert("error: not enough ICs")
             else:
                 treeviewTo.insert("", "end", iid=index, values=(name, index, qty, tubeType))
-            s.messageInsert("Added IC: " + name + " at index " + index)
+                s.messageInsert("Added IC: " + name + " at index " + index)
         else:
             s.messageInsert("error: no ICs left in tube")
 
