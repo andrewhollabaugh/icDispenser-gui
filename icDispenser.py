@@ -15,6 +15,8 @@ class App:
     monoFont = ("Monospace", 9)
     monoFontBold = ("Monospace", 9, "bold")
 
+    invFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
+
     inventory = []
     formattedInventory = []
     selectedItems = []
@@ -284,9 +286,8 @@ class App:
     #First reads the file and puts contents in inventory list (sorted by index)
     #Creates a formattedInventory array, formatted for use in the itemListBox, using contents from inventory list
     def getInventoryFromFile(s):
-        invFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
         inventory = []
-        with open(invFilePath, 'r') as invFile:
+        with open(s.invFilePath, 'r') as invFile:
             itemData = csv.reader(invFile, delimiter=',')
             for item in itemData:
                 inventory.append(item)
