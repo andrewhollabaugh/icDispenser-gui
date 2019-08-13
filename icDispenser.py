@@ -174,11 +174,11 @@ class App:
 
         s.undoButton = Button(s.controlFrame, text="Undo", font=s.monoFont, bg="orange", command=s.undoDispense)
         
-        s.changeItemsButton = Button(s.controlFrame, text="Change Item Locations", font=s.monoFont)
+        s.updateInvButton = Button(s.controlFrame, text="Update Inventory", font=s.monoFont, command=lambda: s.updateInvTree(s.invTree))
 
         #controlFrame grid
         s.advancedFrame.grid(row=0, column=0, rowspan=3)
-        s.changeItemsButton.grid(row=1, column=1)
+        s.updateInvButton.grid(row=1, column=1)
         s.disableButton.grid(row=2, column=1)
         s.undoButton.grid(row=3, column=1)
 
