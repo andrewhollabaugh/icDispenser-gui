@@ -296,40 +296,33 @@ class App:
         return inventory
 
     #Functionality for overwriting a single value to the inventory.csv file.
-    #indexStr - string containing index of item to modify
-    #valueType - string specifying the parameter to modify. Options are  "name", "qtyInTube" 
+    #index - index of item to modify
+    #valueType - string specifying the parameter to modify. Options are "name", "qty", "tubeType" 
     #value - new value to write
-    def writeInventory(s, indexStr, valueType, value):
-        itemData = []
+    def writeInventory(s, index, valueType, value):
+        inventory = s.getInventoryFromFile()
         
-        #Read the inventory.csv file first and put into list
-        with open(s.inventoryFilePath, 'r') as inventoryFile:
-            itemFile = csv.reader(inventoryFile, delimiter=',')
-            for item in itemFile:
-                itemData.append(item)
+        print("inventory before writing: " + inventory)
 
-        print("itemData when writing: " + str(itemData))
-
-        index = int(indexStr)
+        indexInt = int(index)
 
         #Get row that will be modified
-        itemRow = itemData[index]
+        row = inventory[index]
 
         if valueType == "name":
-            itemData[index] = [value, itemRow[1]]
-        elif valueType == "qtyInTube":
-            itemData[index] = [itemRow[0], value]
+            inventory[index] = [value, row[1], row[2]]
+        elif valueType == "qty":
+            inventory[index] = [row[0], value, row[2]]
+        elif valueType == "tubeType":
+            inventory[index] = [row[0], row[1], value]
 
-        print("itemData when writing2: " + str(itemData))
+        print("inventory after writing: " + inventory)
 
         #Write back the entire inventory to the file
-        with open(s.inventoryFilePath, 'w') as inventoryFile:
-            writer = csv.writer(inventoryFile, delimiter=',')
-            for item in itemData:
+        with open(s.invFilePath, 'w') as invFile:
+            writer = csv.writer(invFile, delimiter=',')
+            for item in inventory:
                 writer.writerow(item)
-
-        s.updateInventory()
-        #s.sortOptionMenuChange()
 
     #Open serial communications with microcontroller
     def openSerial(s):
@@ -533,6 +526,7 @@ class App:
             elif serialLine == "done homing dispenser":
                 if s.state == "dispense":
                     s.disRNext()
+                    s.updateInvTree(s.invTree)
                 elif s.state == "homing":
                     s.homeSM()
             elif serialLine == "start sel home":
