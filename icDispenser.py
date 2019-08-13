@@ -128,7 +128,7 @@ class App:
 
         s.disLabel = Label(s.commonFrame, text="ICs To Dispense", font=s.monoFontBold)
 
-        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItem(s.invTree, s.disTree))
+        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItem(s.invTree, s.disTree, dontCare.get()))
 
         s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=lambda: s.removeItem(s.disTree))
 
@@ -158,6 +158,9 @@ class App:
         s.moveOneButton = Button(s.advancedFrame, text="Move to next tube", font=s.monoFont, command=s.moveOne)
         s.moveToSelectedItemButton = Button(s.advancedFrame, text="Move to selected tube", font=s.monoFont, command=lambda: s.moveToSelectedItem(s.invTree))
 
+        dontCare = IntVar()
+        s.dontCareCheckbutton = Checkbutton(s.advancedFrame, text="Don't care if there aren't enough ICs left", variable=dontCare)
+
         s.enableSMButton.grid(row=0, column=0, sticky=W)
         s.enableDMButton.grid(row=2, column=0, sticky=W)
         s.disableSMButton.grid(row=1, column=0, sticky=W)
@@ -166,6 +169,7 @@ class App:
         s.homeDispenserButton.grid(row=5, column=0, sticky=W)
         s.moveOneButton.grid(row=6, column=0, sticky=W)
         s.moveToSelectedItemButton.grid(row=7, column=0, sticky=W)
+        s.dontCareCheckbutton.grid(row=8, column=0, sticky=W)
         #end advancedFrame stuff
 
         s.disableButton = Button(s.controlFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
@@ -241,7 +245,7 @@ class App:
 
     #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
     #If no item is selected, it adds the first item (index 0)
-    def addItem(s, treeviewFrom, treeviewTo):
+    def addItem(s, treeviewFrom, treeviewTo, dontCare):
         index = treeviewFrom.selection()[0]
         indexInt = int(index)
 
@@ -251,14 +255,14 @@ class App:
         tubeType = values['Tube']
         qty = 1
 
-        if int(qtyLeft) > 0:
+        if int(qtyLeft) > 0 or dontCare:
             indexesAlreadyIn = []
             for item in treeviewTo.get_children(""):
                 indexesAlreadyIn.append(item)
             if index in indexesAlreadyIn:
                 qtyAlreadyIn = treeviewTo.set(index)['Qty']
                 qtyNew = int(qtyAlreadyIn) + int(qty)
-                if qtyNew <= int(qtyLeft):
+                if qtyNew <= int(qtyLeft) or dontCare:
                     treeviewTo.set(index, column="Qty", value=qtyNew)
                     s.messageInsert("Added IC: " + name + " at index " + index)
                 else:
