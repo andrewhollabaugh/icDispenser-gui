@@ -177,8 +177,12 @@ class App:
 
         s.updateInvButton = Button(s.miscFrame, text="Update Inventory", font=s.monoFont, bg="orange", command=lambda: s.updateInvTree(s.invTree))
 
+        s.dontUpdateInv = IntVar()
+        s.dontUpdateInvCheckbutton = Checkbutton(s.miscFrame, text="Don't update inventory after dispensing", variable=s.dontUpdateInv)
+
         s.disableButton.grid(row=0, column=0, sticky=W)
         s.updateInvButton.grid(row=1, column=0, sticky=W)
+        s.dontUpdateInvCheckbutton.grid(row=2, column=0, sticky=W)
         #end miscFrame stuff
 
         #controlFrame grid
@@ -451,12 +455,12 @@ class App:
 
     #Updates inventory.csv file, dispense list, inventory list after a dispense action. Repeats the dispense
     #cycle by running disMoveToIndex if there are more items to dispense
-    def disRNext(s, treeview):
-        index = s.dispense[0][0]
-        qtyDispensed = s.dispense[0][1]
-        qtyInTube = int(s.getInventoryFromFile()[index][1])
-
-        s.writeInventory(s.dispense[0][0], "qty", str(qtyInTube - qtyDispensed))
+    def disRNext(s, treeview, dontUpdateInv):
+        if not dontUpdateInv:
+            index = s.dispense[0][0]
+            qtyDispensed = s.dispense[0][1]
+            qtyInTube = int(s.getInventoryFromFile()[index][1])
+            s.writeInventory(s.dispense[0][0], "qty", str(qtyInTube - qtyDispensed))
 
         del s.dispense[0]
 
@@ -490,7 +494,7 @@ class App:
                 s.disRDispense()
             elif serialLine == "done homing dispenser":
                 if s.state == "dispense":
-                    s.disRNext(s.disTree)
+                    s.disRNext(s.disTree, s.dontUpdateInv)
             elif serialLine == "start sel home":
                 s.messageInsert("Homing selector")
             elif serialLine == "dispenser already homed":
