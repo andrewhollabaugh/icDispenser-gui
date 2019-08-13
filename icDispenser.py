@@ -15,8 +15,6 @@ class App:
     monoFont = ("Monospace", 9)
     monoFontBold = ("Monospace", 9, "bold")
 
-    inventoryFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
-    itemListFormat = "{:<12} #InTube {:<6} i{:<}"
     inventory = []
     formattedInventory = []
     selectedItems = []
@@ -203,8 +201,7 @@ class App:
 
 
         #OTHER INIT STUFF
-        s.updateInventory()
-        s.updateInvTree(s.invTree, s.inventory)
+        s.updateInvTree(s.invTree)
         s.messageInsert("IC Dispenser Started")
         s.openSerial()
 
@@ -233,7 +230,8 @@ class App:
         #reverse sorting
         treeview.heading(col, command=lambda _col=col: s.treeviewSortColumn(treeview, _col, not reverse))
 
-    def updateInvTree(s, treeview, inventory):
+    def updateInvTree(s, treeview):
+        inventory = s.getInventoryFromFile()
         treeview.delete(*treeview.get_children())
         for item in inventory:
             index = inventory.index(item)
@@ -285,14 +283,16 @@ class App:
     #Update inventory list from inventory.csv file
     #First reads the file and puts contents in inventory list (sorted by index)
     #Creates a formattedInventory array, formatted for use in the itemListBox, using contents from inventory list
-    def updateInventory(s):
-        s.inventory = []
-        with open(s.inventoryFilePath, 'r') as inventoryFile:
-            itemData = csv.reader(inventoryFile, delimiter=',')
+    def getInventoryFromFile(s):
+        invFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
+        inventory = []
+        with open(invFilePath, 'r') as invFile:
+            itemData = csv.reader(invFile, delimiter=',')
             for item in itemData:
-                s.inventory.append(item)
+                inventory.append(item)
 
-        print("inventory after reading: " + str(s.inventory))
+        print("inventory after reading: " + str(inventory))
+        return inventory
 
     #Functionality for overwriting a single value to the inventory.csv file.
     #indexStr - string containing index of item to modify
