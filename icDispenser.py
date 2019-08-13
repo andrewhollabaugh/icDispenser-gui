@@ -17,10 +17,6 @@ class App:
 
     invFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
 
-    inventory = []
-    formattedInventory = []
-    selectedItems = []
-    formattedSelectedItems = []
     dispense = []
 
     moveSelCommand = "M"
