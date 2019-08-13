@@ -57,7 +57,6 @@ class App:
         #   -addArrowButton
         #   -removeArrowButton
         #   -dispenseButton
-        #   -undoButton
         #controlFrame
         #   -advancedFrame
         #       -debug/test buttons
@@ -174,15 +173,12 @@ class App:
 
         s.disableButton = Button(s.controlFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
 
-        s.undoButton = Button(s.controlFrame, text="Undo", font=s.monoFont, bg="orange", command=s.undoDispense)
-        
         s.updateInvButton = Button(s.controlFrame, text="Update Inventory", font=s.monoFont, command=lambda: s.updateInvTree(s.invTree))
 
         #controlFrame grid
         s.advancedFrame.grid(row=0, column=0, rowspan=3)
         s.updateInvButton.grid(row=1, column=1)
         s.disableButton.grid(row=2, column=1)
-        s.undoButton.grid(row=3, column=1)
 
         #MESSAGEFRAME STUFF
         s.messageListBoxFrame = Frame(s.messageFrame)
@@ -470,9 +466,6 @@ class App:
 
     def resetDisR(s):
         s.dispense = []
-
-    def undoDispense(s):
-        pass
 
     #Runs when window is closed. Used to update hasExited so SerialThread knows when to stop
     def onClosing(s):
