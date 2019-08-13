@@ -160,7 +160,7 @@ class App:
         s.homeSelectorButton = Button(s.advancedFrame, text="Home Selector", font=s.monoFont, command=s.homeSM)
         s.homeDispenserButton = Button(s.advancedFrame, text="Home Dispenser", font=s.monoFont, command=s.homeDM)
         s.moveOneButton = Button(s.advancedFrame, text="Move to next tube", font=s.monoFont, command=s.moveOne)
-        s.moveToSelectedItemButton = Button(s.advancedFrame, text="Move to selected item", font=s.monoFont, command=s.moveToSelectedItem)
+        s.moveToSelectedItemButton = Button(s.advancedFrame, text="Move to selected tube", font=s.monoFont, command=lambda: s.moveToSelectedItem(s.invTree))
 
         s.enableSMButton.grid(row=0, column=0, sticky=W)
         s.enableDMButton.grid(row=2, column=0, sticky=W)
@@ -388,20 +388,11 @@ class App:
         success = s.sendSerial(s.homeDisCommand)
         if success: s.messageInsert("homing dispenser")
 
-    def initHome(s):
-        s.state = "homing"
-        s.hasHomed = True
-        s.sendCommandWithArgument(s.dispenseCommand, -3)
-
     #Move selector to item selected in itemListBox, mainly for debug
-    def moveToSelectedItem(s):
-        #if s.hasHomed:
-        name = s.itemListBox.get(ACTIVE)
-        index = s.formattedInventory.index(name) #get the listbox index of the item
+    def moveToSelectedItem(s, treeview):
+        index = treeview.selection()[0]
         s.sendCommandWithArgument(s.moveSelCommand, index)
-        s.messageInsert("Moving to tube " + name)
-        #else:
-        #    s.initHome()
+        #s.messageInsert("Moving to tube " + name)
 
     #Send serial command that has a three-digit argument
     def sendCommandWithArgument(s, command, arg):
