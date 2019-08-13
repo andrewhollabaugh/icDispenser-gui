@@ -271,7 +271,7 @@ class App:
                 treeviewTo.insert("", "end", iid=index, values=(name, index, qty, tubeType))
                 s.messageInsert("Added IC: " + name + " at index " + index)
         else:
-            s.messageInsert("error: no ICs left in tube")
+            s.messageInsert("error: not enough ICs")
 
     #Remove item from list of selected items (itemListBox2), occurs when left arrow button is pressed
     def removeItem(s, treeview):
