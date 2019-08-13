@@ -360,11 +360,13 @@ class App:
     def disableSM(s):
         success = s.sendSerial(s.disableSelCommand)
         if success: s.messageInsert("disabling selector motor")
+        s.resetDisR()
 
     #Disable dispenser motor
     def disableDM(s):
         success: s.sendSerial(s.disableDisCommand)
         if success: s.messageInsert("disabling dispenser motor")
+        s.resetDisR()
 
     #Disable both motors
     def disableAll(s):
