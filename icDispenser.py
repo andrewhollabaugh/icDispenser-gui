@@ -161,6 +161,9 @@ class App:
         dontCare = IntVar()
         s.dontCareCheckbutton = Checkbutton(s.advancedFrame, text="Don't care if there aren't enough ICs left", variable=dontCare)
 
+        s.dontUpdateInv = IntVar()
+        s.dontUpdateInvCheckbutton = Checkbutton(s.advancedFrame, text="Don't update inventory after dispensing", variable=s.dontUpdateInv)
+
         s.enableSMButton.grid(row=0, column=0, sticky=W)
         s.enableDMButton.grid(row=2, column=0, sticky=W)
         s.disableSMButton.grid(row=1, column=0, sticky=W)
@@ -170,6 +173,7 @@ class App:
         s.moveOneButton.grid(row=6, column=0, sticky=W)
         s.moveToSelectedItemButton.grid(row=7, column=0, sticky=W)
         s.dontCareCheckbutton.grid(row=8, column=0, sticky=W)
+        s.dontUpdateInvCheckbutton.grid(row=9, column=0, sticky=W)
         #end advancedFrame stuff
 
         #miscFrame stuff
@@ -177,12 +181,8 @@ class App:
 
         s.updateInvButton = Button(s.miscFrame, text="Update Inventory", font=s.monoFont, bg="orange", command=lambda: s.updateInvTree(s.invTree))
 
-        s.dontUpdateInv = IntVar()
-        s.dontUpdateInvCheckbutton = Checkbutton(s.miscFrame, text="Don't update inventory after dispensing", variable=s.dontUpdateInv)
-
         s.disableButton.grid(row=0, column=0, sticky=W)
         s.updateInvButton.grid(row=1, column=0, sticky=W)
-        s.dontUpdateInvCheckbutton.grid(row=2, column=0, sticky=W)
         #end miscFrame stuff
 
         #controlFrame grid
