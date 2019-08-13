@@ -137,7 +137,7 @@ class App:
         s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=lambda: s.removeItem(s.disTree))
 
         s.dispenseFrame = Frame(s.commonFrame, relief=RIDGE, borderwidth=5)
-        s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", command=s.initDispenseRoutine)
+        s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", command=lambda: s.disRInit(s.disTree))
         s.dispenseButton.grid(row=0, column=0)
 
         #commonframe grid
@@ -418,41 +418,16 @@ class App:
     #to position. disDispense() is called, and it waits for another signal to say it is done dispensing.
     #disNext() is called, which updates stuff and either ends the dispense routine, or calls disMoveToIndex() again
     #if there is another item to dispense
-    def initDispenseRoutine(s):
-        #if there are any items selected to dispense
-        if s.itemListBox2.size() > 0:
-            listItems = s.itemListBox2.get(0, END)
+    def disRInit(s, treeview):
+        s.dispense = []
+        indexesToDispense = treeview.get_children("")
 
-            for item in listItems:
-                #find the 'i' in the formatted listbox string. The item's index is the character after the 'i'
-                iLocation = item.find('i')
-                indexLocation = iLocation + 1
-
-                #Set index by substringing the formmated listbox string
-                index = item[indexLocation : indexLocation + 1]
-
-                #determine if index is already in dispense list
-                for item in s.dispense:
-                    if item[0] == index:
-                        alreadyIn = True
-                        break
-                    else:
-                        alreadyIn = False
-
-                if len(s.dispense) == 0:
-                    alreadyIn = False
-
-                if not alreadyIn:
-                    s.dispense.append([index, '1'])
-                else:
-                    for item in s.dispense:
-                        if item[0] == index:
-                            #Add 1 to the item's quantity to dispense
-                            item[1] = str(int(item[1]) + 1)
+        if len(indexesToDispense) > 0:
+            for index in indexesToDispense:
+                qty = treeview.set(index)['Qty']
+                s.dispense.append([int(index), qty])
             print(s.dispense)
-            
             s.disRMoveToIndex()
-
         else:
             s.messageInsert("error: no items to dispense")
 
@@ -461,32 +436,31 @@ class App:
         index = s.dispense[0][0]
         s.sendCommandWithArgument(s.moveSelCommand, index)
         s.state = "moveToIndex"
-        s.messageInsert("Dispense: Moving to index " + index)
+        s.messageInsert("Dispense: moving to index " + index)
 
     #Sends a dispense command during the dispense routine based on the dispense and inventory lists.
     #Calculates number of millimeters to dispense
     def disRDispense(s):
-        qtyToDispense = int(s.dispense[0][1])
-        s.sendCommandWithArgument(s.dispenseCommand, qtyToDispense)
+        qty = s.dispense[0][1]
+        s.sendCommandWithArgument(s.dispenseCommand, qty)
         s.state = "dispense"
-        s.messageInsert("Dispense: Dispensing " + str(qtyToDispense) + " items")
+        s.messageInsert("Dispense: dispensing " + str(qty) + " items")
 
     #Updates inventory.csv file, dispense list, inventory list after a dispense action. Repeats the dispense
     #cycle by running disMoveToIndex if there are more items to dispense
-    def disRNext(s):
-        index = int(s.dispense[0][0])
-        qtyDispensed = int(s.dispense[0][1])
-        qtyInTube = int(s.inventory[index][1])
+    def disRNext(s, treeview):
+        index = s.dispense[0][0]
+        qtyDispensed = s.dispense[0][1]
+        qtyInTube = int(s.getInventoryFromFile()[index][1])
 
-        #update inventory.csv file 
-        s.writeInventory(s.dispense[0][0], "qtyInTube", str(qtyInTube - qtyDispensed))
+        s.writeInventory(s.dispense[0][0], "qty", str(qtyInTube - qtyDispensed))
 
         del s.dispense[0]
 
         print("dispenseList: " + str(s.dispense))
 
         if len(s.dispense) == 0:
-            s.itemListBox2.delete(0, END)
+            treeview.delete(*treeview.get_children())
             s.state = "none"
             s.messageInsert("Dispense: Done")
         else:
@@ -516,14 +490,9 @@ class App:
                 s.disRDispense()
             elif serialLine == "done homing dispenser":
                 if s.state == "dispense":
-                    s.disRNext()
-                    s.updateInvTree(s.invTree)
-                elif s.state == "homing":
-                    s.homeSM()
+                    s.disRNext(s.disTree)
             elif serialLine == "start sel home":
                 s.messageInsert("Homing selector")
-            elif serialLine == "done homing selector" and s.state == "homing":
-                s.state = "none"
             elif serialLine == "dispenser already homed":
                 s.messageInsert("dispenser already homed")
 
