@@ -146,6 +146,7 @@ class App:
 
         #CONTROLFRAME STUFF
         s.advancedFrame = LabelFrame(s.controlFrame, text="Advanced", font=s.monoFont, relief=RIDGE, borderwidth=5)
+        s.miscFrame = LabelFrame(s.controlFrame, text="Misc", font=s.monoFont, relief=RIDGE, borderwidth=5)
 
         #advancedFrame stuff
         s.enableSMButton = Button(s.advancedFrame, text="Enable Selector Motor", font=s.monoFont, command=s.enableSM)
@@ -171,14 +172,18 @@ class App:
         s.dontCareCheckbutton.grid(row=8, column=0, sticky=W)
         #end advancedFrame stuff
 
-        s.disableButton = Button(s.controlFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
+        #miscFrame stuff
+        s.disableButton = Button(s.miscFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
 
-        s.updateInvButton = Button(s.controlFrame, text="Update Inventory", font=s.monoFont, command=lambda: s.updateInvTree(s.invTree))
+        s.updateInvButton = Button(s.miscFrame, text="Update Inventory", font=s.monoFont, bg="orange", command=lambda: s.updateInvTree(s.invTree))
+
+        s.disableButton.grid(row=0, column=0, sticky=W)
+        s.updateInvButton.grid(row=1, column=0, sticky=W)
+        #end miscFrame stuff
 
         #controlFrame grid
-        s.advancedFrame.grid(row=0, column=0, rowspan=3)
-        s.updateInvButton.grid(row=1, column=1)
-        s.disableButton.grid(row=2, column=1)
+        s.advancedFrame.grid(row=0, column=0)
+        s.miscFrame.grid(row=1, column=0, sticky=EW)
 
         #MESSAGEFRAME STUFF
         s.messageListBoxFrame = Frame(s.messageFrame)
