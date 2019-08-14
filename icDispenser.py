@@ -1,11 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 import serial
-import numpy
 import csv
 import threading
 import queue
-#import tkSimpleDialog
 
 global hasExited
 global serialQueue 
@@ -34,7 +32,6 @@ class App:
     ser = None
 
     state = "none" #Possible states: none, moveToIndex, dispense, homing
-    hasHomed = False
     global hasExited
     hasExited = False
 
