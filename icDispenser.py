@@ -297,6 +297,8 @@ class App:
             for item in itemData:
                 inventory.append(item)
 
+        s.sendCommandWithArgument(s.totalTubesCommand, len(inventory))
+
         print("inventory after reading: " + str(inventory))
         return inventory
 
