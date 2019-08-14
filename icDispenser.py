@@ -221,6 +221,7 @@ class App:
 
     def messageInsert(s, message):
         s.messageListBox.insert(END, message)
+        s.messageListBox.yview_moveto(1)
         print("message: " + message)
 
     def clearMessageListBox(s):
