@@ -41,29 +41,40 @@ class App:
 
         root.title("IC Dispenser")
 
-        #FRAME/IMPORTANT WIDGET HIERARCHY
+        #WIDGET HIERARCHY
         #commonFrame
-        #   -itemSelectFrame
-        #       -itemListBox
-        #       -itemListBoxScrollbar
-        #   -itemSelectFrame2
-        #       -itemListBox2
-        #       -itemListBox2Scrollbar
-        #   -sortFrame
-        #       -sortOptionMenu
-        #   -addArrowButton
-        #   -removeArrowButton
-        #   -dispenseButton
+        #   -invLabel
+        #   -invFrame
+        #       -invTree
+        #       -invTreeScroll
+        #   -disLabel
+        #   -disFrame
+        #       -disTree
+        #       -disTreeScroll
+        #   -addButton
+        #   -removeButton
+        #   -dispenseFrame
+        #       -dispenseButton
         #controlFrame
         #   -advancedFrame
-        #       -debug/test buttons
-        #   -disableButton
-        #   -changeItemsButton
+        #       -enableSMButton
+        #       -enableDMButton
+        #       -disableSMButton
+        #       -disableDMButton
+        #       -homeSelectorDMButton
+        #       -homeDispenserButton
+        #       -moveOneButton
+        #       -moveToSelectedItemButton
+        #       -dontCareCheckbutton
+        #       -dontUpdateInvCheckbutton
+        #   -miscFrame
+        #       -disableButton
+        #       -changeItemsButton
         #messageFrame
         #   -messageListBoxFrame
         #       -messageListBox
         #       -messageListBoxScrollbar
-        #   -messageClearButton
+        #       -messageClearButton
 
         #TOP-LEVEL FRAMES
         s.commonFrame = Frame(root, relief=RIDGE, borderwidth=5)
@@ -235,6 +246,7 @@ class App:
         #reverse sorting
         treeview.heading(col, command=lambda _col=col: s.treeviewSortColumn(treeview, _col, not reverse))
 
+    #Updates the inventory treeview based on the inventory file
     def updateInvTree(s, treeview):
         inventory = s.getInventoryFromFile()
         treeview.delete(*treeview.get_children())
@@ -246,8 +258,7 @@ class App:
             treeview.insert("", "end", iid=index, values=(name, index, qty, tubeType))
         treeview.selection_set(0)
 
-    #Add item to list of selected items (itemListBox2), occurs when right arrow button is pressed
-    #If no item is selected, it adds the first item (index 0)
+    #Add selected item from invTree to disTree
     def addItem(s, treeviewFrom, treeviewTo, dontCare):
         index = treeviewFrom.selection()[0]
         indexInt = int(index)
@@ -260,9 +271,9 @@ class App:
 
         if int(qtyLeft) > 0 or dontCare:
             indexesAlreadyIn = []
-            for item in treeviewTo.get_children(""):
+            for item in treeviewTo.get_children(""): #determine which tubes (indexes) are already in disTree
                 indexesAlreadyIn.append(item)
-            if index in indexesAlreadyIn:
+            if index in indexesAlreadyIn: #if already in, get the already in quantity and add new quantity
                 qtyAlreadyIn = treeviewTo.set(index)['Qty']
                 qtyNew = int(qtyAlreadyIn) + int(qty)
                 if qtyNew <= int(qtyLeft) or dontCare:
@@ -276,7 +287,7 @@ class App:
         else:
             s.messageInsert("error: not enough ICs")
 
-    #Remove item from list of selected items (itemListBox2), occurs when left arrow button is pressed
+    #Remove selected item from disTree
     def removeItem(s, treeview):
         selectedItems = treeview.selection()
         if len(selectedItems) > 0:
@@ -285,9 +296,7 @@ class App:
             treeview.delete(index)
             s.messageInsert("Removed IC: " + name + " at index " + index)
 
-    #Update inventory list from inventory.csv file
-    #First reads the file and puts contents in inventory list (sorted by index)
-    #Creates a formattedInventory array, formatted for use in the itemListBox, using contents from inventory list
+    #Get inventory list based on inventory.csv file
     def getInventoryFromFile(s):
         inventory = []
         with open(s.invFilePath, 'r') as invFile:
@@ -295,6 +304,7 @@ class App:
             for item in itemData:
                 inventory.append(item)
 
+        #send the inventory length (# of indexes) to controller so it can position correctly
         s.sendCommandWithArg(s.totalTubesCommand, len(inventory))
 
         print("inventory after reading: " + str(inventory))
