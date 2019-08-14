@@ -371,7 +371,7 @@ class App:
 
     #Disable dispenser motor
     def disableDM(s):
-        success: s.sendSerial(s.disableDisCommand)
+        success = s.sendSerial(s.disableDisCommand)
         if success: s.messageInsert("disabling dispenser motor")
         s.resetDisR()
 
