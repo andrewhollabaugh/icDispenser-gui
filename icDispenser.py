@@ -297,7 +297,7 @@ class App:
             for item in itemData:
                 inventory.append(item)
 
-        s.sendCommandWithArgument(s.totalTubesCommand, len(inventory))
+        s.sendCommandWithArg(s.totalTubesCommand, len(inventory))
 
         print("inventory after reading: " + str(inventory))
         return inventory
@@ -400,11 +400,11 @@ class App:
     #Move selector to item selected in itemListBox, mainly for debug
     def moveToSelectedItem(s, treeview):
         index = treeview.selection()[0]
-        s.sendCommandWithArgument(s.moveSelCommand, index)
+        s.sendCommandWithArg(s.moveSelCommand, index)
         #s.messageInsert("Moving to tube " + name)
 
     #Send serial command that has a three-digit argument
-    def sendCommandWithArgument(s, command, arg):
+    def sendCommandWithArg(s, command, arg):
         argStr = ""
 
         #Add zeros to make sure argument is exactly three digits
@@ -443,7 +443,7 @@ class App:
     #Sends a moveToIndex command during the dispense routine based on the first index in the dispense list
     def disRMoveToIndex(s):
         index = s.dispense[0][0]
-        s.sendCommandWithArgument(s.moveSelCommand, index)
+        s.sendCommandWithArgu(s.moveSelCommand, index)
         s.state = "moveToIndex"
         s.messageInsert("Dispense: moving to index " + index)
 
@@ -451,7 +451,7 @@ class App:
     #Calculates number of millimeters to dispense
     def disRDispense(s):
         qty = s.dispense[0][1]
-        s.sendCommandWithArgument(s.dispenseCommand, qty)
+        s.sendCommandWithArg(s.dispenseCommand, qty)
         s.state = "dispense"
         s.messageInsert("Dispense: dispensing " + str(qty) + " items")
 
