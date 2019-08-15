@@ -392,8 +392,7 @@ class App:
 
     #Home selector motor
     def homeSM(s):
-        success = s.sendSerial(s.homeSelCommand)
-        if success: s.messageInsert("homing selector")
+        s.sendSerial(s.homeSelCommand)
 
     #Move selector to next tube (for testing)
     def moveOne(s):
