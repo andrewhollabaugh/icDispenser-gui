@@ -216,9 +216,8 @@ class App:
 
 
         #OTHER INIT STUFF
-        s.updateInvTree(s.invTree)
-        s.messageInsert("IC Dispenser Started")
         s.openSerial()
+        s.updateInvTree(s.invTree)
 
         global serialQueue
         serialQueue = queue.Queue()
