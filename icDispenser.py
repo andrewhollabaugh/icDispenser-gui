@@ -498,18 +498,17 @@ class App:
             serialLine = serialQueue.get() #also removes item from queue
             print("serialR: " + serialLine)
              
-            if serialLine == "done moving to index" and s.state == "moveToIndex":
+            messagesToPass = ["IC dispenser ready", "done homing selector", "done homing dispenser", "dispenser already homed"]
+            if serialLine in messagesToPass:
+                s.messageInsert(serialLine)
+            elif serialLine == "start sel home":
+                s.messageInsert("homing selector")
+
+            elif serialLine == "done moving to index" and s.state == "moveToIndex":
                 s.disRDispense()
             elif serialLine == "done homing dispenser":
                 if s.state == "dispense":
                     s.disRNext(s.disTree, s.dontUpdateInv)
-
-            elif serialLine == "start sel home":
-                s.messageInsert("Homing selector")
-            elif serialLine == "done homing selector":
-                s.messageInsert("Done homing selector")
-            elif serialLine == "dispenser already homed":
-                s.messageInsert("Dispenser already homed")
 
         root.after(100, s.processSerialRead)
 
