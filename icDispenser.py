@@ -349,7 +349,7 @@ class App:
         except:
             s.messageInsert("error: failed to open serial")
 
-    #Send data over serial with added carriage return
+    #Send data over serial with \n
     def sendSerial(s, data):
         print("serialT: " + data)
         data = data + "\n"
