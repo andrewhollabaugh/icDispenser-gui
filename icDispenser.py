@@ -506,6 +506,8 @@ class App:
                     s.disRNext(s.disTree, s.dontUpdateInv)
             elif serialLine == "start sel home":
                 s.messageInsert("Homing selector")
+            elif serialLine == "done homing selector":
+                s.messageInsert("Done homing selector")
             elif serialLine == "dispenser already homed":
                 s.messageInsert("dispenser already homed")
 
