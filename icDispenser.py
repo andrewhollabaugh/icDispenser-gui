@@ -449,7 +449,7 @@ class App:
     #Sends a moveToIndex command during the dispense routine based on the first index in the dispense list
     def disRMoveToIndex(s):
         index = s.dispense[0][0]
-        s.sendCommandWithArgu(s.moveSelCommand, index)
+        s.sendCommandWithArg(s.moveSelCommand, index)
         s.state = "moveToIndex"
         s.messageInsert("Dispense: moving to index " + index)
 
