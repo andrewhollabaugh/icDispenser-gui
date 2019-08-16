@@ -316,7 +316,7 @@ class App:
     def writeInventory(s, index, valueType, value):
         inventory = s.getInventoryFromFile()
         
-        print("inventory before writing: " + inventory)
+        print("inventory before writing: " + str(inventory))
 
         indexInt = int(index)
 
@@ -330,7 +330,7 @@ class App:
         elif valueType == "tubeType":
             inventory[index] = [row[0], row[1], value]
 
-        print("inventory after writing: " + inventory)
+        print("inventory after writing: " + str(inventory))
 
         #Write back the entire inventory to the file
         with open(s.invFilePath, 'w') as invFile:
@@ -441,7 +441,7 @@ class App:
             for index in indexesToDispense:
                 qty = treeview.set(index)['Qty']
                 s.dispense.append([int(index), qty])
-            print(s.dispense)
+            print("dispenseList: " + str(s.dispense))
             s.disRMoveToIndex()
         else:
             s.messageInsert("error: no items to dispense")
