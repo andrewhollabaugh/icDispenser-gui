@@ -451,7 +451,7 @@ class App:
         index = s.dispense[0][0]
         s.sendCommandWithArg(s.moveSelCommand, index)
         s.state = "moveToIndex"
-        s.messageInsert("Dispense: moving to index " + index)
+        s.messageInsert("Dispense: moving to index " + str(index))
 
     #Sends a dispense command during the dispense routine based on the dispense and inventory lists.
     #Calculates number of millimeters to dispense
