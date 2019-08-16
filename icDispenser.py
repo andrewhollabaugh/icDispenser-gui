@@ -504,11 +504,11 @@ class App:
             elif serialLine == "start sel home":
                 s.messageInsert("homing selector")
 
-            elif serialLine == "done moving to index" and s.state == "moveToIndex":
+            if serialLine == "done moving to index" and s.state == "moveToIndex":
                 s.disRDispense()
-            elif serialLine == "done homing dispenser":
-                if s.state == "dispense":
-                    s.disRNext(s.disTree, s.dontUpdateInv)
+            elif serialLine == "done homing dispenser" and s.state == "dispense":
+                s.disRNext(s.disTree, s.dontUpdateInv.get())
+                s.updateInvTree(s.invTree)
 
         root.after(100, s.processSerialRead)
 
