@@ -468,7 +468,7 @@ class App:
             index = s.dispense[0][0]
             qtyDispensed = s.dispense[0][1]
             qtyInTube = int(s.getInventoryFromFile()[index][1])
-            s.writeInventory(s.dispense[0][0], "qty", str(qtyInTube - qtyDispensed))
+            s.writeInventory(s.dispense[0][0], "qty", str(qtyInTube - int(qtyDispensed)))
 
         del s.dispense[0]
 
