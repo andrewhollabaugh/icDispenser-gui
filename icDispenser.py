@@ -135,9 +135,26 @@ class App:
 
         s.disLabel = Label(s.commonFrame, text="ICs To Dispense", font=s.monoFontBold)
 
-        s.addButton = Button(s.commonFrame, text="Add Selected ICs", font=s.monoFont, bg="#497efc", command=lambda: s.addItem(s.invTree, s.disTree, dontCare.get()))
 
-        s.deleteButton = Button(s.commonFrame, text="Remove Selected ICs", font=s.monoFont, bg="#f92529", command=lambda: s.removeItem(s.disTree))
+        s.addFrame = Frame(s.commonFrame, relief=SUNKEN, borderwidth=2)
+        s.addButton = Button(s.addFrame, text="Add Selected IC", font=s.monoFont, bg="#497efc", width=25, command=lambda: s.addItem(s.invTree, s.disTree, s.addSpinbox.get(), dontCare.get()))
+        s.addQtyLabel = Label(s.addFrame, text="Qty: ", font=s.monoFont)
+
+        s.addSpinbox = Spinbox(s.addFrame, from_=1, to=99, width=2)
+        s.addQtyLabel.grid(row=0, column=0)
+        s.addSpinbox.grid(row=0, column=1)
+        s.addButton.grid(row=0, column=2)
+
+        s.deleteFrame = Frame(s.commonFrame, relief=SUNKEN, borderwidth=2)
+        s.deleteButton = Button(s.deleteFrame, text="Remove Selected IC", font=s.monoFont, bg="#f95c61", width=25, command=lambda: s.removeItem(s.disTree, s.deleteSpinbox.get()))
+        s.deleteAllButton = Button(s.deleteFrame, text="Remove All ICs", font=s.monoFont, bg="#ff0000", command=lambda: s.removeAllItems(s.disTree))
+        s.deleteQtyLabel = Label(s.deleteFrame, text="Qty: ", font=s.monoFont)
+        s.deleteSpinbox = Spinbox(s.deleteFrame, from_=1, to=99, width=2)
+
+        s.deleteQtyLabel.grid(row=0, column=0)
+        s.deleteSpinbox.grid(row=0, column=1)
+        s.deleteButton.grid(row=0, column=2)
+        s.deleteAllButton.grid(row=1, column=0, columnspan=3, sticky=EW)
 
         s.dispenseFrame = Frame(s.commonFrame, relief=RIDGE, borderwidth=5)
         s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", command=lambda: s.disRInit(s.disTree))
@@ -146,10 +163,10 @@ class App:
         #commonframe grid
         s.invLabel.grid(row=0, column=0)
         s.invFrame.grid(row=1, column=0, rowspan=2)
-        s.addButton.grid(row=3, column=0, sticky=EW)
+        s.addFrame.grid(row=3, column=0)
         s.disLabel.grid(row=0, column=1)
         s.disFrame.grid(row=1, column=1, sticky=N)
-        s.deleteButton.grid(row=2, column=1, sticky=EW)
+        s.deleteFrame.grid(row=2, column=1)
         s.dispenseFrame.grid(row=3, column=1, sticky=E)
 
         #CONTROLFRAME STUFF
@@ -258,7 +275,7 @@ class App:
         treeview.selection_set(0)
 
     #Add selected item from invTree to disTree
-    def addItem(s, treeviewFrom, treeviewTo, dontCare):
+    def addItem(s, treeviewFrom, treeviewTo, qty, dontCare):
         index = treeviewFrom.selection()[0]
         indexInt = int(index)
 
@@ -266,7 +283,6 @@ class App:
         name = values['Part']
         qtyLeft = values['Qty']
         tubeType = values['Tube']
-        qty = 1
 
         if int(qtyLeft) > 0 or dontCare:
             indexesAlreadyIn = []
@@ -277,23 +293,38 @@ class App:
                 qtyNew = int(qtyAlreadyIn) + int(qty)
                 if qtyNew <= int(qtyLeft) or dontCare:
                     treeviewTo.set(index, column="Qty", value=qtyNew)
-                    s.messageInsert("Added IC: " + name + " at index " + index)
+                    s.messageInsert("Added IC: " + name + " at index " + index + " qty of " + qty)
                 else:
                     s.messageInsert("error: not enough ICs")
             else:
                 treeviewTo.insert("", "end", iid=index, values=(name, index, qty, tubeType))
-                s.messageInsert("Added IC: " + name + " at index " + index)
+                s.messageInsert("Added IC: " + name + " at index " + index + " qty of " + qty)
         else:
             s.messageInsert("error: not enough ICs")
 
     #Remove selected item from disTree
-    def removeItem(s, treeview):
+    def removeItem(s, treeview, qty):
         selectedItems = treeview.selection()
         if len(selectedItems) > 0:
             index = selectedItems[0]
             name = treeview.set(index)['Part']
-            treeview.delete(index)
-            s.messageInsert("Removed IC: " + name + " at index " + index)
+            qtyPresent = treeview.set(index)['Qty']
+            qtyToRemove = int(qty)
+            qtyLeft = qtyPresent - qtyToRemove
+            if qtyLeft >= 0:
+                if qtyLeft == 0:
+                    treeview.delete(index)
+                else:
+                    treeview.set(index, column="Qty", value=qtyLeft)
+                s.messageInsert("Removed IC: " + name + " at index " + index + " qty of " + qty)
+            else:
+                s.messageInsert("not enough ICs")
+        else:
+            s.messageInsert("error: nothing seleced")
+
+    def removeAllItems(s, treeview):
+        treeview.delete(*treeview.get_children())
+        s.messageInsert("Removed all ICs")
 
     #Get inventory list based on inventory.csv file
     def getInventoryFromFile(s):
@@ -304,7 +335,7 @@ class App:
                 inventory.append(item)
 
         #send the inventory length (# of indexes) to controller so it can position correctly
-        s.sendCommandWithArg(s.totalTubesCommand, len(inventory))
+        if s.ser is not None: s.sendCommandWithArg(s.totalTubesCommand, len(inventory))
 
         print("inventory after reading: " + str(inventory))
         return inventory
@@ -345,6 +376,7 @@ class App:
 
         try:
             s.ser = serial.Serial(port, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
+            s.ser.setDTR(False)
             s.messageInsert("serial connected")
         except:
             s.messageInsert("error: failed to open serial")
@@ -509,6 +541,9 @@ class App:
             elif serialLine == "done homing dispenser" and s.state == "dispense":
                 s.disRNext(s.disTree, s.dontUpdateInv.get())
                 s.updateInvTree(s.invTree)
+            #elif serialLine == "IC dispenser ready":
+            #    s.homeSM()
+            #    s.homeDM()
 
         root.after(100, s.processSerialRead)
 
