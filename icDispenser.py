@@ -115,7 +115,7 @@ class App:
         s.disFrame = Frame(s.commonFrame)
 
         disTreeColumns = ("Part", "Index", "Qty", "Tube")
-        s.disTree = ttk.Treeview(s.disFrame, column=disTreeColumns, show="headings", selectmode="extended", height=14)
+        s.disTree = ttk.Treeview(s.disFrame, column=disTreeColumns, show="headings", selectmode="extended", height=17)
         s.disTree.column("Part", width=100, anchor='w')
         s.disTree.column("Index", width=50, anchor='w')
         s.disTree.column("Qty", width=50, anchor='w')
