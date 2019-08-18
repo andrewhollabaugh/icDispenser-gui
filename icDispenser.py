@@ -157,7 +157,7 @@ class App:
         s.deleteAllButton.grid(row=1, column=0, columnspan=3, sticky=EW)
 
         s.dispenseFrame = Frame(s.commonFrame, relief=RIDGE, borderwidth=5)
-        s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", command=lambda: s.disRInit(s.disTree))
+        s.dispenseButton = Button(s.dispenseFrame, text="Dispense", font=s.monoFont, bg="lime", width=36, command=lambda: s.disRInit(s.disTree))
         s.dispenseButton.grid(row=0, column=0)
 
         #commonframe grid
@@ -167,7 +167,7 @@ class App:
         s.disLabel.grid(row=0, column=1)
         s.disFrame.grid(row=1, column=1, sticky=N)
         s.deleteFrame.grid(row=2, column=1)
-        s.dispenseFrame.grid(row=3, column=1, sticky=E)
+        s.dispenseFrame.grid(row=3, column=1, sticky=EW)
 
         #CONTROLFRAME STUFF
         s.advancedFrame = LabelFrame(s.controlFrame, text="Advanced", font=s.monoFont, relief=RIDGE, borderwidth=5)
