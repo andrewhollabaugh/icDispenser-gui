@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import serial
 import csv
 import threading
@@ -242,6 +243,12 @@ class App:
         serialThread = SerialThread(s.ser)
         serialThread.start()
         s.processSerialRead()
+
+
+    def askHomeOnStartup(s):
+        if messagebox.askyesno("Home?", "The IC Dispenser must be homed before use. Would you like to home?"):
+            s.homeSM()
+            s.homeDM()
 
     def messageInsert(s, message):
         s.messageListBox.insert(END, message)
@@ -541,11 +548,10 @@ class App:
             elif serialLine == "done homing dispenser" and s.state == "dispense":
                 s.disRNext(s.disTree, s.dontUpdateInv.get())
                 s.updateInvTree(s.invTree)
-            #elif serialLine == "IC dispenser ready":
-            #    s.homeSM()
-            #    s.homeDM()
+            elif serialLine == "IC dispenser ready":
+                s.askHomeOnStartup()
 
-        root.after(100, s.processSerialRead)
+        root.after(50, s.processSerialRead)
 
 #Reads serial port in a separate thread
 class SerialThread(threading.Thread):
