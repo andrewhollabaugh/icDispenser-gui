@@ -41,7 +41,7 @@ class App:
     def __init__(s, root):
 
         root.title("IC Dispenser")
-
+        
         #WIDGET HIERARCHY
         #commonFrame
         #   -invLabel
