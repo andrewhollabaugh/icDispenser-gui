@@ -80,7 +80,7 @@ class App:
         #TOP-LEVEL FRAMES
         s.commonFrame = Frame(root, relief=RIDGE, borderwidth=5)
         s.controlFrame = Frame(root)
-        s.messageFrame = Frame(root)
+        s.messageFrame = Frame(root, relief=RIDGE, borderwidth=5)
 
         #toplevel frame grid
         s.commonFrame.grid(row=0, column=0)
