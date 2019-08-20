@@ -484,15 +484,16 @@ class App:
                 qty = treeview.set(index)['Qty']
                 s.dispense.append([int(index), qty])
             print("dispenseList: " + str(s.dispense))
-            s.disRMoveToIndex()
+            s.disRMoveToIndex(treeview)
         else:
             s.messageInsert("error: no items to dispense")
 
     #Sends a moveToIndex command during the dispense routine based on the first index in the dispense list
-    def disRMoveToIndex(s):
+    def disRMoveToIndex(s, treeview):
         index = s.dispense[0][0]
         s.sendCommandWithArg(s.moveSelCommand, index)
         s.state = "moveToIndex"
+        treeview.selection_set(index)
         s.messageInsert("Dispense: moving to index " + str(index))
 
     #Sends a dispense command during the dispense routine based on the dispense and inventory lists.
@@ -521,7 +522,7 @@ class App:
             s.state = "none"
             s.messageInsert("Dispense: Done")
         else:
-            s.disRMoveToIndex()
+            s.disRMoveToIndex(treeview)
 
     def resetDisR(s):
         s.dispense = []
