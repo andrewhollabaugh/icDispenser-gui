@@ -204,11 +204,12 @@ class App:
 
         #miscFrame stuff
         s.disableButton = Button(s.miscFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
-
         s.updateInvButton = Button(s.miscFrame, text="Update Inventory", font=s.monoFont, bg="orange", command=lambda: s.updateInvTree(s.invTree))
+        s.reconnectSerialButton = Button(s.miscFrame, text="Reconnect Serial", font=s.monoFont, bg="teal", command=s.reconnectSerial)
 
         s.disableButton.grid(row=0, column=0, sticky=W)
         s.updateInvButton.grid(row=1, column=0, sticky=W)
+        s.reconnectSerialButton.grid(row=2, column=0, sticky=W)
         #end miscFrame stuff
 
         #controlFrame grid
@@ -248,7 +249,6 @@ class App:
     def askHomeOnStartup(s):
         if messagebox.askyesno("Home?", "The IC Dispenser must be homed before use. Would you like to home?"):
             s.homeSM()
-            s.homeDM()
 
     def messageInsert(s, message):
         s.messageListBox.insert(END, message)
@@ -383,7 +383,6 @@ class App:
 
         try:
             s.ser = serial.Serial(port, baud, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
-            s.ser.setDTR(False)
             s.messageInsert("serial connected")
         except:
             s.messageInsert("error: failed to open serial")
@@ -398,6 +397,10 @@ class App:
         except:
             s.messageInsert("error: serial port closed")
             return False
+
+    def reconnectSerial(s):
+        s.openSerial()
+        s.askHomeOnStartup()
 
     #Enable selector motor
     def enableSM(s):
