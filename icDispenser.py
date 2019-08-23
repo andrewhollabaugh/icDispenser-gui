@@ -505,21 +505,21 @@ class App:
         s.state = "dispense"
         s.messageInsert("Dispense: dispensing " + str(qty) + " items")
 
-    #Updates inventory.csv file, dispense list, inventory list after a dispense action. Repeats the dispense
-    #cycle by running disMoveToIndex if there are more items to dispense
-    def disRNext(s, treeview, dontUpdateInv):
+    def disRUpdate(s, treeview, dontUpdateInv):
         if not dontUpdateInv:
             index = s.dispense[0][0]
             qtyDispensed = s.dispense[0][1]
-            qtyInTube = int(s.getInventoryFromFile()[index][1])
-            s.writeInventory(s.dispense[0][0], "qty", str(qtyInTube - int(qtyDispensed)))
+            qtyInTube = int(s.inventory[index][1])
+            s.writeInv(s.dispense[0][0], "qty", str(qtyInTube - int(qtyDispensed)))
 
         del s.dispense[0]
-
+        treeview.delete(index)
         print("dispenseList: " + str(s.dispense))
 
+    #Updates inventory.csv file, dispense list, inventory list after a dispense action. Repeats the dispense
+    #cycle by running disMoveToIndex if there are more items to dispense
+    def disRNext(s, treeview):
         if len(s.dispense) == 0:
-            treeview.delete(*treeview.get_children())
             s.state = "none"
             s.messageInsert("Dispense: Done")
         else:
@@ -550,9 +550,11 @@ class App:
 
             if serialLine == "done moving to index" and s.state == "moveToIndex":
                 s.disRDispense()
-            elif serialLine == "done homing dispenser" and s.state == "dispense":
-                s.disRNext(s.disTree, s.dontUpdateInv.get())
+            elif serialLine == "dispenser homing" and s.state == "dispense":
+                s.disRUpdate(s.disTree, s.dontUpdateInv.get())
                 s.updateInvTree(s.invTree)
+            elif serialLine == "done homing dispenser" and s.state == "dispense":
+                s.disRNext(s.disTree)
             elif serialLine == "IC dispenser ready":
                 s.askHomeOnStartup()
 
