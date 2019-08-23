@@ -222,7 +222,7 @@ class App:
 
         #messageListBoxFrame stuff
         s.messageListBoxScroll = Scrollbar(s.messageListBoxFrame, orient=VERTICAL)
-        s.messageListBox = Listbox(s.messageListBoxFrame, width=50, height=26, font=s.monoFont, yscrollcommand=s.messageListBoxScroll.set)
+        s.messageListBox = Listbox(s.messageListBoxFrame, width=70, height=28, font=s.monoFont, yscrollcommand=s.messageListBoxScroll.set)
         s.messageListBoxScroll.config(command=s.messageListBox.yview)
         s.messageListBox.pack(side=LEFT)
         s.messageListBoxScroll.pack(side=RIGHT, fill=Y)
