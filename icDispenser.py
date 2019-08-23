@@ -204,7 +204,7 @@ class App:
 
         #miscFrame stuff
         s.disableButton = Button(s.miscFrame, text="STOP", font=s.monoFont, bg="red", fg="white", width=10, height=4, command=s.disableAll)
-        s.updateInvButton = Button(s.miscFrame, text="Update Inventory", font=s.monoFont, bg="orange", command=lambda: s.updateInvTree(s.invTree))
+        s.updateInvButton = Button(s.miscFrame, text="Update Inventory", font=s.monoFont, bg="orange", command=lambda: s.updateInvButtonPress(s.invTree))
         s.reconnectSerialButton = Button(s.miscFrame, text="Reconnect Serial", font=s.monoFont, bg="teal", command=s.reconnectSerial)
 
         s.disableButton.grid(row=0, column=0, sticky=W)
@@ -236,6 +236,7 @@ class App:
 
         #OTHER INIT STUFF
         s.openSerial()
+        s.updateInvFromFile(updateTotalTubes=True)
         s.updateInvTree(s.invTree)
 
         global serialQueue
@@ -269,17 +270,19 @@ class App:
         #reverse sorting
         treeview.heading(col, command=lambda _col=col: s.treeviewSortColumn(treeview, _col, not reverse))
 
+    def updateInvButtonPress(s, treeview):
+        s.updateInvFromFile(updateTotalTubes=True)
+        s.updateInvTree(treeview)
+
     #Updates the inventory treeview based on the inventory file
     def updateInvTree(s, treeview):
-        inventory = s.getInventoryFromFile()
         treeview.delete(*treeview.get_children())
-        for item in inventory:
-            index = inventory.index(item)
+        for item in s.inventory:
+            index = s.inventory.index(item)
             name = item[0]
             qty = item[1]
             tubeType = item[2]
             treeview.insert("", "end", iid=index, values=(name, index, qty, tubeType))
-        treeview.selection_set(0)
 
     #Add selected item from invTree to disTree
     def addItem(s, treeviewFrom, treeviewTo, qty, dontCare):
@@ -334,46 +337,44 @@ class App:
         s.messageInsert("Removed all ICs")
 
     #Get inventory list based on inventory.csv file
-    def getInventoryFromFile(s):
-        inventory = []
+    def updateInvFromFile(s, updateTotalTubes=False):
+        s.inventory = []
         with open(s.invFilePath, 'r') as invFile:
             itemData = csv.reader(invFile, delimiter=',')
             for item in itemData:
-                inventory.append(item)
+                s.inventory.append(item)
 
         #send the inventory length (# of indexes) to controller so it can position correctly
-        if s.ser is not None: s.sendCommandWithArg(s.totalTubesCommand, len(inventory))
+        if updateTotalTubes and s.ser is not None:
+            s.sendCommandWithArg(s.totalTubesCommand, len(s.inventory))
 
-        print("inventory after reading: " + str(inventory))
-        return inventory
+        print("inventory after reading: " + str(s.inventory))
 
     #Functionality for overwriting a single value to the inventory.csv file.
     #index - index of item to modify
     #valueType - string specifying the parameter to modify. Options are "name", "qty", "tubeType" 
     #value - new value to write
-    def writeInventory(s, index, valueType, value):
-        inventory = s.getInventoryFromFile()
-        
-        print("inventory before writing: " + str(inventory))
+    def writeInv(s, index, valueType, value):
+        print("inventory before writing: " + str(s.inventory))
 
         indexInt = int(index)
 
         #Get row that will be modified
-        row = inventory[index]
+        row = s.inventory[index]
 
         if valueType == "name":
-            inventory[index] = [value, row[1], row[2]]
+            s.inventory[index] = [value, row[1], row[2]]
         elif valueType == "qty":
-            inventory[index] = [row[0], value, row[2]]
+            s.inventory[index] = [row[0], value, row[2]]
         elif valueType == "tubeType":
-            inventory[index] = [row[0], row[1], value]
+            s.inventory[index] = [row[0], row[1], value]
 
-        print("inventory after writing: " + str(inventory))
+        print("s.inventory after writing: " + str(s.inventory))
 
         #Write back the entire inventory to the file
         with open(s.invFilePath, 'w') as invFile:
             writer = csv.writer(invFile, delimiter=',')
-            for item in inventory:
+            for item in s.inventory:
                 writer.writerow(item)
 
     #Open serial communications with microcontroller
