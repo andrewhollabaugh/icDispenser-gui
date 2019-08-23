@@ -16,7 +16,8 @@ class App:
     monoFontBold = ("Monospace", 9, "bold")
 
     invFilePath = "/home/andrew/icDispenser-gui/inventory.csv"
-
+    logFilePath = "/home/andrew/icDispenser-gui/log.txt"
+    
     dispense = []
 
     moveSelCommand = "M"
@@ -258,6 +259,9 @@ class App:
         s.messageListBox.insert(END, message)
         s.messageListBox.yview_moveto(1)
         print("message: " + message)
+	
+        with open(s.logFilePath, 'a') as logFile:
+            logFile.write(message + "\n")
 
     def clearMessageListBox(s):
         s.messageListBox.delete(0, END)
