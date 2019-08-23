@@ -5,6 +5,7 @@ import serial
 import csv
 import threading
 import queue
+import time
 
 global hasExited
 global serialQueue 
@@ -252,6 +253,8 @@ class App:
             s.homeSM()
 
     def messageInsert(s, message):
+        localtime = time.asctime(time.localtime(time.time()))
+        message = "[" + localtime + "] " + message
         s.messageListBox.insert(END, message)
         s.messageListBox.yview_moveto(1)
         print("message: " + message)
