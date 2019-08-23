@@ -527,6 +527,7 @@ class App:
 
     def resetDisR(s):
         s.dispense = []
+        s.state = "none"
 
     #Runs when window is closed. Used to update hasExited so SerialThread knows when to stop
     def onClosing(s):
