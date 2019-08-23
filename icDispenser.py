@@ -95,8 +95,8 @@ class App:
         invTreeColumns = ("Part", "Index", "Qty", "Tube")
         s.invTree = ttk.Treeview(s.invFrame, columns=invTreeColumns, show="headings", selectmode="extended", height=20)
         s.invTree.column("Part", width=100, anchor='w')
-        s.invTree.column("Index", width=50, anchor='w')
-        s.invTree.column("Qty", width=50, anchor='w')
+        s.invTree.column("Index", width=50, anchor='c')
+        s.invTree.column("Qty", width=50, anchor='c')
         s.invTree.column("Tube", width=70, anchor='w')
 
         for col in invTreeColumns:
@@ -118,8 +118,8 @@ class App:
         disTreeColumns = ("Part", "Index", "Qty", "Tube")
         s.disTree = ttk.Treeview(s.disFrame, column=disTreeColumns, show="headings", selectmode="extended", height=17)
         s.disTree.column("Part", width=100, anchor='w')
-        s.disTree.column("Index", width=50, anchor='w')
-        s.disTree.column("Qty", width=50, anchor='w')
+        s.disTree.column("Index", width=50, anchor='c')
+        s.disTree.column("Qty", width=50, anchor='c')
         s.disTree.column("Tube", width=70, anchor='w')
 
         for col in disTreeColumns:
