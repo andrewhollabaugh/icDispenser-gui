@@ -550,7 +550,7 @@ class App:
             serialLine = serialQueue.get() #also removes item from queue
             print("serialR: " + serialLine)
              
-            messagesToPass = ["IC dispenser ready", "done homing selector", "done homing dispenser", "dispenser already homed", "dispenser not homed! dispensing now"]
+            messagesToPass = ["IC dispenser ready", "done homing selector", "done homing dispenser", "dispenser already homed", "dispenser not homed! dispensing now", "error: dispenser went too far!"]
             if serialLine in messagesToPass:
                 s.messageInsert(serialLine)
             elif serialLine == "start sel home":
