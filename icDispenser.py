@@ -513,8 +513,9 @@ class App:
         s.messageInsert("Dispense: dispensing " + str(qty) + " items")
 
     def disRUpdate(s, treeview, dontUpdateInv):
+        index = s.dispense[0][0]
+
         if not dontUpdateInv:
-            index = s.dispense[0][0]
             qtyDispensed = s.dispense[0][1]
             qtyInTube = int(s.inventory[index][1])
             s.writeInv(s.dispense[0][0], "qty", str(qtyInTube - int(qtyDispensed)))
