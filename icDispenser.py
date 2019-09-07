@@ -293,7 +293,12 @@ class App:
 
     #Add selected item from invTree to disTree
     def addItem(s, treeviewFrom, treeviewTo, qty, dontCare):
-        index = treeviewFrom.selection()[0]
+        if len(treeviewFrom.selection()) > 0:
+            index = treeviewFrom.selection()[0]
+        else:
+            s.messageInsert("error: no tube selected")
+            return
+
         indexInt = int(index)
 
         values = treeviewFrom.set(index)
