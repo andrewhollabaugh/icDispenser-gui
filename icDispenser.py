@@ -411,6 +411,10 @@ class App:
             s.messageInsert("error: serial port closed")
             return False
 
+    #Send serial command that has an argument
+    def sendCommandWithArg(s, command, arg):
+        s.sendSerial(command + str(arg))
+
     def reconnectSerial(s):
         s.openSerial()
         s.askHomeOnStartup()
@@ -463,19 +467,6 @@ class App:
         index = treeview.selection()[0]
         s.sendCommandWithArg(s.moveSelCommand, index)
         #s.messageInsert("Moving to tube " + name)
-
-    #Send serial command that has a three-digit argument
-    def sendCommandWithArg(s, command, arg):
-        argStr = ""
-
-        #Add zeros to make sure argument is exactly three digits
-        if int(arg) < 10:
-            argStr = "00" + str(arg)
-        elif int(arg) < 100:
-            argStr = "0" + str(arg)
-        else:
-            argStr = str(arg)
-        s.sendSerial(command + argStr)
 
     #Initiialze the dispense routine. How the dispense routine works:
     #This method is run whenever the dispense button is pressed. It adds the items in the selected items list
