@@ -253,6 +253,7 @@ class App:
         if messagebox.askyesno("Home?", "The IC Dispenser must be homed before use. Would you like to home?"):
             s.homeSM()
 
+    #Adds message to message box, prints, and logs
     def messageInsert(s, message):
         localtime = time.asctime(time.localtime(time.time()))
         message = "[" + localtime + "] " + message
@@ -266,6 +267,7 @@ class App:
     def clearMessageListBox(s):
         s.messageListBox.delete(0, END)
 
+    #Sorts items in treeview in alphabetical order. Called when user clicks column header. Reverses when clicked again
     def treeviewSortColumn(s, treeview, col, reverse):
         l = [(treeview.set(k, col), k) for k in treeview.get_children('')]
         l.sort(reverse=reverse)
@@ -277,6 +279,7 @@ class App:
         #reverse sorting
         treeview.heading(col, command=lambda _col=col: s.treeviewSortColumn(treeview, _col, not reverse))
 
+    #Called when updateInvButton is pressed. Updates inv and the inv tree
     def updateInvButtonPress(s, treeview):
         s.updateInvFromFile(updateTotalTubes=True)
         s.updateInvTree(treeview)
@@ -291,8 +294,9 @@ class App:
             tubeType = item[2]
             treeview.insert("", "end", iid=index, values=(name, index, qty, tubeType))
 
-    #Add selected item from invTree to disTree
+    #Add selected item from invTree to disTree. dontCare is whether it cares if there are no items left, usually false
     def addItem(s, treeviewFrom, treeviewTo, qty, dontCare):
+        #Check if any items are selected
         if len(treeviewFrom.selection()) > 0:
             index = treeviewFrom.selection()[0]
         else:
@@ -470,10 +474,8 @@ class App:
 
     #Initiialze the dispense routine. How the dispense routine works:
     #This method is run whenever the dispense button is pressed. It adds the items in the selected items list
-    #(listbox2) to the dispense list. The dispense list is a 2D list that contains the hardware index and
-    #number of items to dispense in each row. When items are read from the selected items list, either a new
-    #row in the dispense list is created (if that item's index not already in the dispense list) or add 1 to
-    #the dispense amount in an existing row (if the item's index is already in the dispense list).
+    #(invTree) to the dispense list. The dispense list is a 2D list that contains the hardware index and
+    #number of items to dispense in each row.
     #
     #disMoveToIndex() is called, then waits for a serial signal from the microcontroller to say it is done moving
     #to position. disDispense() is called, and it waits for another signal to say it is done dispensing.
@@ -500,14 +502,16 @@ class App:
         treeview.selection_set(index)
         s.messageInsert("Dispense: moving to index " + str(index))
 
-    #Sends a dispense command during the dispense routine based on the dispense and inventory lists.
-    #Calculates number of millimeters to dispense
+    #Sends a dispense command during the dispense routine based on the dispense list
     def disRDispense(s):
         qty = s.dispense[0][1]
         s.sendCommandWithArg(s.dispenseCommand, qty)
         s.state = "dispense"
         s.messageInsert("Dispense: dispensing " + str(qty) + " items")
 
+    #Updates the inventory, invTree, and s.dispense after a dispense. Called right after items are dispensed and
+    #before dispenser is homed. dontUpdateInv is true when the dontUpdateInv checkbox is checked, signifying the
+    #inventory should not be updated after a dispense for debugging purposes
     def disRUpdate(s, treeview, dontUpdateInv):
         index = s.dispense[0][0]
 
@@ -520,8 +524,8 @@ class App:
         treeview.delete(index)
         print("dispenseList: " + str(s.dispense))
 
-    #Updates inventory.csv file, dispense list, inventory list after a dispense action. Repeats the dispense
-    #cycle by running disMoveToIndex if there are more items to dispense
+    #Determines if the entire dispense operation is done by checking the length of s.dispense. Calls disRMoveToIndex
+    #again if there are more items to dispense
     def disRNext(s, treeview):
         if len(s.dispense) == 0:
             s.state = "none"
@@ -529,6 +533,7 @@ class App:
         else:
             s.disRMoveToIndex(treeview)
 
+    #Resets a dispense operation. Called when disable buttons are pressed.
     def resetDisR(s):
         s.dispense = []
         s.state = "none"
@@ -540,26 +545,30 @@ class App:
         hasExited = True
         root.destroy()
     
-    #Reads serialQueue and does things depending on what is read. Run in a loop once every 100 milliseconds
+    #Reads serialQueue and does things depending on what is read. Run in a loop once every 50 milliseconds
     def processSerialRead(s):
         global serialQueue
         while not serialQueue.empty():
             serialLine = serialQueue.get() #also removes item from queue
             print("serialR: " + serialLine)
              
+            #messages received from embedded that should be duplicated as a message in the gui
             messagesToPass = ["IC dispenser ready", "done homing selector", "done homing dispenser", "dispenser already homed", "dispenser not homed! dispensing now", "error: dispenser went too far!"]
             if serialLine in messagesToPass:
                 s.messageInsert(serialLine)
             elif serialLine == "start sel home":
                 s.messageInsert("homing selector")
 
+            #things received on serial that trigger events in the dispense routine
             if serialLine == "done moving to index" and s.state == "moveToIndex":
                 s.disRDispense()
             elif serialLine == "dispenser homing" and s.state == "dispense":
                 s.disRUpdate(s.disTree, s.dontUpdateInv.get())
-                s.updateInvTree(s.invTree)
+                s.updateInvTree(s.invTree) #update invTree after disRUpdate updates the inv file
             elif serialLine == "done homing dispenser" and s.state == "dispense":
                 s.disRNext(s.disTree)
+
+            #run askHomeOnStartup when board is ready
             elif serialLine == "IC dispenser ready":
                 s.askHomeOnStartup()
 
